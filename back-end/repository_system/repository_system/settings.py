@@ -10,31 +10,37 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+"""
+Django settings for repository_system project.
+"""
+
 from pathlib import Path
 import environ
 import os
+import sys
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Import Jazzmin settings
+from admin.superadmin.superadmin import JAZZMIN_SETTINGS,JAZZMIN_UI_TWEAKS
+
+
 
 # Initialize environment variables
 env = environ.Env()
-environ.Env.read_env(os.path.join(os.path.dirname(__file__), '../.env'))  # Ensure correct path
+environ.Env.read_env(os.path.join(os.path.dirname(__file__), '../.env'))
 
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='fallback-email@example.com')  # Debugging default
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='fallback-email@example.com')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='fallback-password')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY WARNING: keep the secret key used in production secret! warring make it in the env file 
 SECRET_KEY = 'django-insecure-mq!ofn#n4!xr&%bxy80(4lt817$g67wsf(1fle7m1=v_9-r3!4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -42,19 +48,18 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
-
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'rest_framework',
     'users',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +70,34 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 
+]
+
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
 ]
 
 ROOT_URLCONF = 'repository_system.urls'
@@ -131,9 +164,12 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

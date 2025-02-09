@@ -11,7 +11,7 @@ export default function Header() {
     { name: 'Profile', path: '/profile' },
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'About', path: '/about' },
-    { name: 'Login', path: '/login' }
+    { name: 'SignIn', path: '/login' }
   ];
 
   return (

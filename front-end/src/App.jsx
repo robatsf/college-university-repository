@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ToastProvider } from './components/ui/toast/toast-context';
-import { Toaster } from './components/ui/toast/toaster';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
 
 // Page components
 import Login from './pages/auth/Login';
@@ -11,40 +11,56 @@ import MainPage from './pages/MainPage';
 import NotFound from './pages/NotFound';
 import Browserdetails from './pages/BrowseDetail';
 import FilePage from './pages/ViewFilepage';
+import TermsAndPrivacyPolicy from './pages/TermsAndPrivacyPolicy';
 
 // Auth guard component
 const PrivateRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('token');
+  const isAuthenticated = localStorage.getItem('token'); // Check if user is authenticated
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
 const AppRoutes = () => {
   return (
-    <ToastProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<MainPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/ForgotPassword" element={<ForgotPassword />} />
-          <Route path="/BrowseDetail/:id" element={<Browserdetails />} />
-          <Route path="/filepage/" element={<FilePage />} />
+    <BrowserRouter>
+      {/* Routing configuration */}
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<MainPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgotpassword" element={<ForgotPassword />} /> {/* Fixed route name */}
+        <Route path="/browsedetail/:id" element={<Browserdetails />} /> {/* Improved route naming */}
+        <Route path="/filepage" element={<FilePage />} />
+        <Route path="/TermsAndPrivacyPolicy" element={<TermsAndPrivacyPolicy />} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/profile"
-            element={
-                <Profile />
-            }
-          />
+        {/* Protected Routes */}
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
 
-          {/* 404 Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-      <Toaster />
-    </ToastProvider>
+        {/* 404 Route */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      {/* Add ToastContainer for react-toastify */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored" // Optional: Use a colored theme
+      />
+    </BrowserRouter>
   );
 };
 

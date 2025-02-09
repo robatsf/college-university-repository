@@ -1,8 +1,5 @@
-import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+
+import {Link } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import {
   Form,
@@ -13,115 +10,31 @@ import {
   FormMessage,
 } from '../../components/ui/form';
 import { Input } from '../../components/ui/input';
-import { useToast } from "../../components/ui/toast/toast-context"
 import { Loader2, User, Mail, Lock, KeyRound, Check, X, Eye, EyeOff,Home } from 'lucide-react';
+import { useRegisterForm } from '../../hooks/auth/UserRegster';
 
-const registerSchema = z.object({
-  username: z.string()
-    .min(3, 'Username must be at least 3 characters')
-    .max(20, 'Username must be less than 20 characters')
-    .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens'),
-  email: z.string()
-    .email('Invalid email address')
-    .min(1, 'Email is required'),
-  password: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const ValidationIndicator = ({ isValid }) => (
+  isValid ? 
+    <Check className="h-4 w-4 text-green-500" /> : 
+    <X className="h-4 w-4 text-gray-300" />
+);
 
 export default function Register() {
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-  const { toast } = useToast();
 
-  const form = useForm({
-    resolver: zodResolver(registerSchema),
-    mode: 'onChange',
-    defaultValues: {
-      username: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-    },
-  });
-
-  // Watch form values for real-time validation
-  const watchUsername = form.watch('username');
-  const watchEmail = form.watch('email');
-  const watchPassword = form.watch('password');
-  const watchConfirmPassword = form.watch('confirmPassword');
-
-  // Password strength indicators
-  const [passwordStrength, setPasswordStrength] = React.useState({
-    length: false,
-    uppercase: false,
-    lowercase: false,
-    number: false,
-    special: false
-  });
-
-  React.useEffect(() => {
-    if (watchPassword) {
-      setPasswordStrength({
-        length: watchPassword.length >= 8,
-        uppercase: /[A-Z]/.test(watchPassword),
-        lowercase: /[a-z]/.test(watchPassword),
-        number: /[0-9]/.test(watchPassword),
-        special: /[^A-Za-z0-9]/.test(watchPassword)
-      });
-    }
-  }, [watchPassword]);
-
-  const ValidationIndicator = ({ isValid }) => (
-    isValid ? 
-      <Check className="h-4 w-4 text-green-500" /> : 
-      <X className="h-4 w-4 text-gray-300" />
-  );
-
-  async function onSubmit(data) {
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Here you would typically make your API call
-      // const response = await fetch('/api/auth/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     username: data.username,
-      //     email: data.email,
-      //     password: data.password,
-      //   }),
-      // });
-      // const result = await response.json();
-      // if (!response.ok) throw new Error(result.message);
-
-      toast({
-        title: "Success",
-        description: "Registration successful! Please login.",
-      });
-
-      navigate('/login');
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Something went wrong",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const {
+    form,
+    isLoading,
+    showPassword,
+    setShowPassword,
+    showConfirmPassword,
+    setShowConfirmPassword,
+    watchUsername,
+    watchEmail,
+    watchPassword,
+    watchConfirmPassword,
+    passwordStrength,
+    onSubmit,
+  } = useRegisterForm();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
@@ -380,9 +293,9 @@ export default function Register() {
 
         <div className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">
           By creating an account, you agree to our{' '}
-          <Link to="/terms" className="text-[#0066CC] hover:text-[#0052A3]">Terms</Link>{' '}
+          <Link to="/TermsAndPrivacyPolicy" className="text-[#0066CC] hover:text-[#0052A3]">Terms</Link>{' '}
           and{' '}
-          <Link to="/privacy" className="text-[#0066CC] hover:text-[#0052A3]">Privacy Policy</Link>
+          <Link to="/TermsAndPrivacyPolicy" className="text-[#0066CC] hover:text-[#0052A3]">Privacy Policy</Link>
         </div>
       </div>
     </div>
