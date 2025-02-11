@@ -1,0 +1,8 @@
+bin
+lib
+include
+lib64
+db.sqlite3
+.env
+.vscode/*
+staticfiles

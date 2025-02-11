@@ -1,0 +1,128 @@
+/* static/css/custom_jazzmin.css */
+
+/* Custom logo size */
+.brand-image {
+    max-height: 30px !important;
+    margin-top: 5px;
+    border-radius: 20px;
+}
+img {
+    max-height: 70px !important;
+    margin-top: 5px; 
+}
+
+/* Custom form styling */
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Custom button styling */
+.btn-primary {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+/* Custom login page styling */
+.login-page {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.login-box {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom dashboard widgets */
+.small-box {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Custom navigation tabs */
+.nav-tabs .nav-link.active {
+    border-color: #3498db;
+    color: #3498db;
+}
+
+/* Custom modal styling */
+.modal-content {
+    border-radius: 10px;
+}
+
+/* Custom sidebar menu item spacing */
+.nav-sidebar .nav-item {
+    margin-bottom: 5px;
+}
+
+/* Custom breadcrumb styling */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0.5rem 1rem;
+}
+
+/* Custom filter sidebar styling */
+.sidebar-filters {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/* Custom action buttons */
+.actions-btn {
+    border-radius: 20px;
+    padding: 5px 15px;
+}
+
+/* Custom select2 styling */
+.select2-container--default .select2-selection--single {
+    border-radius: 5px;
+    height: 38px;
+    line-height: 38px;
+}
+
+/* Custom checkbox styling */
+.custom-checkbox .custom-control-label::before {
+    border-radius: 3px;
+}
+
+/* Custom switch styling */
+.custom-switch .custom-control-label::before {
+    height: 20px;
+    width: 40px;
+}
+
+/* Custom file input styling */
+.custom-file-label {
+    border-radius: 5px;
+}
+
+/* Custom pagination styling */
+.pagination .page-link {
+    border-radius: 5px;
+    margin: 0 2px;
+}
+
+/* Custom alert styling */
+.alert {
+    border-radius: 10px;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    border-left-color: #28a745;
+}
+
+.alert-warning {
+    border-left-color: #ffc107;
+}
+
+.alert-danger {
+    border-left-color: #dc3545;
+}
