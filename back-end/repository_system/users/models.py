@@ -1,6 +1,8 @@
 from django.db import models
 import uuid
 from django.utils.timezone import now
+from django.contrib.auth.hashers import make_password
+
 
 # ------------------- STUDENT TABLE -------------------
 class Student(models.Model):
@@ -11,12 +13,23 @@ class Student(models.Model):
     department = models.CharField(max_length=255)
     year = models.IntegerField()
     profile_image = models.CharField(max_length=255, blank=True, null=True)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True,null=True)  # Personal email
+    institutional_email = models.EmailField(unique=True)  # System-generated email
     password = models.CharField(max_length=255)  # Hashed password
     ask_for_forget_password = models.BooleanField(default=False)
-    history_id = models.UUIDField()
+    history_id = models.UUIDField(null=True)
     created_at = models.DateTimeField(default=now)
     updated_time = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        """Generate institutional email and hash password before saving."""
+        if not self.institutional_email:
+            username_part = self.first_name.lower()[0] + self.last_name.lower()
+            self.institutional_email = f"{username_part}@dcstudents.edu.et"
+        if not self.password:
+            self.password = make_password(uuid.uuid4().hex[:8])  # Generate random password
+        super().save(*args, **kwargs)
+
 
 # ------------------- EMPLOYEE TABLE -------------------
 class Employee(models.Model):
@@ -25,11 +38,28 @@ class Employee(models.Model):
     middle_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255)
     department = models.CharField(max_length=255)
-    role = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
-    history_id = models.UUIDField()
+    role = models.CharField(max_length=255, choices=[("teacher", "Teacher"), ("librarian", "Librarian"), ("department_head", "Department Head")])
+    email = models.EmailField(unique=True,null=True)  # Personal email
+    institutional_email = models.EmailField(unique=True)  # System-generated email
+    password = models.CharField(max_length=255)  # Hashed password
+    history_id = models.UUIDField(null=True)
     created_at = models.DateTimeField(default=now)
     updated_time = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        """Generate institutional email based on role and hash password before saving."""
+        if not self.institutional_email:
+            username_part = self.first_name.lower()[0] + self.last_name.lower()
+            domain_map = {
+                "teacher": "dcteacher.edu.et",
+                "librarian": "dclibrarian.edu.et",
+                "department_head": "dcdh.edu.et"
+            }
+            self.institutional_email = f"{username_part}@{domain_map.get(self.role, 'dcteacher.edu.et')}"
+        if not self.password:
+            self.password = make_password(uuid.uuid4().hex[:8])  # Generate random password
+        super().save(*args, **kwargs)
+
 
 # ------------------- GUEST TABLE -------------------
 class Guest(models.Model):
