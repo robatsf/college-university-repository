@@ -12,6 +12,7 @@ import NotFound from './pages/NotFound';
 import Browserdetails from './pages/BrowseDetail';
 import FilePage from './pages/ViewFilepage';
 import TermsAndPrivacyPolicy from './pages/TermsAndPrivacyPolicy';
+import TeacherDashboard from './pages/teacherDasbord';
 
 // Auth guard component
 const PrivateRoute = ({ children }) => {
@@ -42,6 +43,9 @@ const AppRoutes = () => {
             </PrivateRoute>
           }
         />
+         <Route path="/TeacherDashboard"
+          element={ <TeacherDashboard/> }
+           />
 
         {/* 404 Route */}
         <Route path="*" element={<NotFound />} />

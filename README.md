@@ -1,4 +1,4 @@
-# HUDC Information Retrieval System
+# HUDC IR System
 
 ## Table of Contents
 - [Overview](#overview)
