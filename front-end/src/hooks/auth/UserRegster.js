@@ -74,14 +74,14 @@ export const useRegisterForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${BackendUrl.apiUrl}/users/register`, {
+      const response = await fetch(`${BackendUrl.apiUrl}/users/register-guest/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: data.username,
           email: data.email,
           password: data.password,
-          confirmPassword: data.confirmPassword,
+          confirm_password: data.confirmPassword,
         }),
       });
 

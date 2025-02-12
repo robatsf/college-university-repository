@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import validator from '../../uites/api/APIResponseValidator';
+import BackendUrl from '../config';
 
 // Define the login schema
 const loginSchema = z.object({
@@ -34,27 +36,40 @@ export const useLogin = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/user/login', {
+      const response = await fetch(`${BackendUrl.apiUrl}/users/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
 
-      const result = await response.json();
+      const result = await validator.validateResponse(response, {
+        method: 'POST',
+        endpoint: `${BackendUrl.apiUrl}/users/register`
+      });
 
-      if (!response.ok) {
-        throw new Error(result.message || 'Login failed');
+
+      if (result.success) {
+        toast.success(result.message || 'Registration successful! Please login.');
+        navigate('/login');
+      } else {
+          toast.error(result.message || 'Registration failed');
+           if (result.dev) {
+                console.debug('Developer Info:', result.dev);
+            }
       }
-
-      localStorage.setItem('token', result.token);
-      toast.success('You have successfully logged in.');
-      navigate('/');
     } catch (error) {
-      toast.error(error.message || 'Something went wrong');
+      // Handle network or other critical errors
+      const errorMessage = error.name === 'AbortError'
+        ? 'Request timed out. Please try again.'
+        : error.message === 'Failed to fetch'
+          ? 'Unable to connect to the server. Please check your connection and try again.'
+          : 'An unexpected error occurred. Please try again.';
+
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   return {
     form,

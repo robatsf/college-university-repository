@@ -17,7 +17,7 @@ class Student(models.Model):
     institutional_email = models.EmailField(unique=True)  # System-generated email
     password = models.CharField(max_length=255)  # Hashed password
     ask_for_forget_password = models.BooleanField(default=False)
-    history_id = models.UUIDField(null=True)
+    history_id = models.UUIDField(default=uuid.uuid4, editable=False )
     created_at = models.DateTimeField(default=now)
     updated_time = models.DateTimeField(auto_now=True)
 
@@ -42,7 +42,7 @@ class Employee(models.Model):
     email = models.EmailField(unique=True,null=True)  # Personal email
     institutional_email = models.EmailField(unique=True)  # System-generated email
     password = models.CharField(max_length=255)  # Hashed password
-    history_id = models.UUIDField(null=True)
+    history_id = models.UUIDField( default=uuid.uuid4 ,editable=False)
     created_at = models.DateTimeField(default=now)
     updated_time = models.DateTimeField(auto_now=True)
 
@@ -67,8 +67,8 @@ class Guest(models.Model):
     username = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=255)  # Hashed password
-    request_id = models.UUIDField(blank=True, null=True)
-    history_id = models.UUIDField(blank=True, null=True)
+    request_id = models.UUIDField(default=uuid.uuid4, editable=False)    
+    history_id = models.UUIDField( default=uuid.uuid4, editable=False)
     is_verified = models.BooleanField(default=False)
     email_verification_token = models.CharField(max_length=100, unique=True, blank=True, null=True) 
     created_at = models.DateTimeField(default=now)

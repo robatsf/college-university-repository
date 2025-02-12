@@ -40,8 +40,6 @@ class EmployeeRegistrationView(generics.CreateAPIView):
 
 
 
-
-
 class LoginView(APIView):
     def post(self, request):
         email = request.data.get("email")
