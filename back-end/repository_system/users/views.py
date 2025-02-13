@@ -1,60 +1,128 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-import random
-import string
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import check_password
-from django.contrib.auth.hashers import make_password
-from django.core.mail import send_mail
-from django.utils.crypto import get_random_string
-from .models import Guest,Student, Employee
-from .serializers import GuestRegistrationSerializer,StudentRegistrationSerializer, EmployeeRegistrationSerializer
+from .models import Guest, Student, Employee
+from .serializers import (
+    GuestRegistrationSerializer,
+    StudentRegistrationSerializer, 
+    EmployeeRegistrationSerializer
+)
+
+class ResponseStructure:
+    @staticmethod
+    def success(data=None, message="Success", status_code=status.HTTP_200_OK):
+        response = {
+            "success": True,
+            "data": data,
+            "errors": [],
+            "message": message
+        }
+        return Response(response, status=status_code)
+
+    @staticmethod
+    def error(message="Error", errors=None, status_code=status.HTTP_400_BAD_REQUEST):
+        if not errors:
+            errors = [message]
+        elif isinstance(errors, str):
+            errors = [errors]
+            
+        response = {
+            "success": False,
+            "data": None,
+            "errors": errors,
+            "message": message
+        }
+        return Response(response, status=status_code)
 
 class GuestRegistrationView(generics.CreateAPIView):
     queryset = Guest.objects.all()
     serializer_class = GuestRegistrationSerializer
 
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            result = serializer.save()
+            return ResponseStructure.success(
+                data=result.get('data'),
+                message=result.get('message', "Registration successful. Please check your email for verification."),
+                status_code=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return ResponseStructure.error(
+                message="Registration failed",
+                errors=str(e),
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
 class VerifyGuestView(generics.GenericAPIView):
     def get(self, request, token, *args, **kwargs):
-        # Find the guest by token
-        guest = get_object_or_404(Guest, email_verification_token=token)
+        try:
+            guest = get_object_or_404(Guest, email_verification_token=token)
+            
+            if guest.is_verified:
+                return ResponseStructure.error(
+                    message="Email already verified",
+                    errors=["This email has already been verified"],
+                    status_code=status.HTTP_400_BAD_REQUEST
+                )
 
-        # Mark guest as verified
-        guest.is_verified = True
-        guest.email_verification_token = None  # Remove token after verification
-        guest.save()
+            guest.is_verified = True
+            guest.email_verification_token = None
+            guest.save()
 
-        return Response({"message": "Your email has been verified! You can now log in."}, status=status.HTTP_200_OK)
-
+            return ResponseStructure.success(
+                data={"email": guest.email},
+                message="Email verification successful. You can now log in.",
+                status_code=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return ResponseStructure.error(
+                message="Verification failed",
+                errors=[str(e)],
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
 
 class StudentRegistrationView(generics.CreateAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentRegistrationSerializer
 
-    
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            result = serializer.save()
+            return ResponseStructure.success(
+                data=result.get('data'),
+                message=result.get('message', "Student registration successful. Credentials sent to email."),
+                status_code=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return ResponseStructure.error(
+                message="Registration failed",
+                errors=[str(e)],
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
 
 class EmployeeRegistrationView(generics.CreateAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeRegistrationSerializer
 
-
-
-class LoginView(APIView):
-    def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
-
-        user = None
-
-        # Check if the user is a student
-        if Student.objects.filter(institutional_email=email).exists():
-            user = Student.objects.get(institutional_email=email)
-        # Check if the user is an employee
-        elif Employee.objects.filter(institutional_email=email).exists():
-            user = Employee.objects.get(institutional_email=email)
-
-        if user and check_password(password, user.password):
-            return Response({"message": "Login successful", "role": user.role if hasattr(user, "role") else "student"})
-        return Response({"error": "Invalid email or password"}, status=400)
-
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            result = serializer.save()
+            return ResponseStructure.success(
+                data=result.get('data'),
+                message=result.get('message', "Employee registration successful. Credentials sent to email."),
+                status_code=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return ResponseStructure.error(
+                message="Registration failed",
+                errors=[str(e)],
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
