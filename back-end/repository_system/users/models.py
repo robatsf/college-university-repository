@@ -12,7 +12,7 @@ class Student(models.Model):
     last_name = models.CharField(max_length=255)
     department = models.CharField(max_length=255)
     year = models.IntegerField()
-    profile_image = models.CharField(max_length=255, blank=True, null=True)
+    profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     email = models.EmailField(unique=True,null=True)  # Personal email
     institutional_email = models.EmailField(unique=True)  # System-generated email
     password = models.CharField(max_length=255)  # Hashed password
