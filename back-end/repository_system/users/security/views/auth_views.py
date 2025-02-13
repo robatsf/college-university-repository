@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from ..serializers.auth_serializers import LoginSerializer, TokenRefreshSerializer
+from ..serializers.auth_serializers import LoginSerializer # TokenRefreshSerializer
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
