@@ -104,6 +104,7 @@ class BaseUserRegistrationSerializer(serializers.ModelSerializer):
             )
 
 class StudentRegistrationSerializer(BaseUserRegistrationSerializer):
+    profile_image = serializers.ImageField(required=False)
     class Meta:
         model = Student
         fields = ['first_name', 'middle_name', 'last_name', 'department', 

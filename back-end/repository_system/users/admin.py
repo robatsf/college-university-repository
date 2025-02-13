@@ -12,6 +12,9 @@ from .models import (
     Student, Employee, Guest, Request, FileSystem, 
      Permissions, Download
 )
+from .utils import UserUtils, EmailService
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password
 
 # Custom Filters
 class DepartmentFilter(SimpleListFilter):
@@ -38,15 +41,22 @@ class BaseModelAdmin(admin.ModelAdmin):
         return self.list_filter + ('created_at',)
 
 @admin.register(Student)
-class StudentAdmin(BaseModelAdmin):
-    list_display = ('first_name', 'last_name', 'department', 'year', 'email', 'status_indicator')
-    list_filter = ('year', DepartmentFilter, 'ask_for_forget_password')
-    search_fields = ('first_name', 'last_name', 'email')
+class StudentAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'department','profile_image_preview', 'year', 'email', 'institutional_email', 'status_indicator')
+    list_filter = ('year', 'department')
+    search_fields = ('first_name', 'last_name', 'email', 'institutional_email')
     ordering = ('-created_at',)
     
+    def profile_image_preview(self, obj):
+        if obj.profile_image:
+            return format_html('<img src="{}" width="50" height="50"/>'.format(obj.profile_image.url))
+        return "No Image"
+
+    profile_image_preview.short_description = "Profile Image"
+
     fieldsets = (
         ('Personal Information', {
-            'fields': ('first_name', 'middle_name', 'last_name')
+            'fields': ('first_name', 'middle_name', 'last_name', 'profile_image')
         }),
         ('Academic Information', {
             'fields': ('department', 'year', 'email')
@@ -57,7 +67,35 @@ class StudentAdmin(BaseModelAdmin):
         if obj.ask_for_forget_password:
             return format_html('<span style="color: red;">⚠️ Password Reset Requested</span>')
         return format_html('<span style="color: green;">✓ Active</span>')
+    
     status_indicator.short_description = 'Status'
+
+    def save_model(self, request, obj, form, change):
+        """
+        Override save_model to generate institutional email, password, and send credentials.
+        """
+        if not obj.institutional_email:
+            obj.institutional_email = UserUtils.generate_institutional_email(obj.first_name, obj.last_name, "student")
+
+        plain_password = UserUtils.generate_password()
+        obj.password = make_password(plain_password)  # Hash the password before saving
+
+        super().save_model(request, obj, form, change)  # Save the student instance
+
+        # Send email with credentials
+        try:
+            EmailService.send_credentials_email(obj.first_name, obj.email, obj.institutional_email, plain_password)
+            self.message_user(request, f"Credentials sent to {obj.email}.", messages.SUCCESS)
+        except Exception as e:
+            self.message_user(request, f"Error sending email: {str(e)}", messages.ERROR)
+
+# admin.site.register(Student, StudentAdmin)
+
+def status_indicator(self, obj):
+        if obj.ask_for_forget_password:
+            return format_html('<span style="color: red;">⚠️ Password Reset Requested</span>')
+        return format_html('<span style="color: green;">✓ Active</span>')
+        status_indicator.short_description = 'Status'
 
 @admin.register(Employee)
 class EmployeeAdmin(BaseModelAdmin):
