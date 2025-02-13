@@ -14,7 +14,7 @@ class PasswordService:
         """Reset user password and send temporary password via email"""
         try:
             # Reuse JWTService's get_user_by_email method to find user
-            user, user_type = JWTService.get_user_by_email(email, None)
+            user, user_type = JWTService.get_user_by_email(email)
             
             # Reuse UserUtils's generate_password method
             temp_password = UserUtils.generate_password()

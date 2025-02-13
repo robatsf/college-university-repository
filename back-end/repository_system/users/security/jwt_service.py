@@ -1,7 +1,7 @@
-# services/jwt_service.py
+# security/jwt_service.py
 
 from datetime import datetime, timedelta
-from typing import Dict, Optional
+from typing import Dict
 import jwt
 from django.conf import settings
 from rest_framework import exceptions
@@ -57,6 +57,43 @@ class JWTService:
                     
         except Exception as e:
             raise exceptions.AuthenticationFailed(str(e))
+    
+    @staticmethod
+    def verify_by_email_(email: str):
+        """Get user from database based on institutional email domain"""
+        try:
+            domain = email.split('@')[1]
+            
+            # Check employee domains
+            employee_domains = {
+                "dcteacher.edu.et": "teacher",
+                "dclibrarian.edu.et": "librarian",
+                "dcdh.edu.et": "department_head"
+            }
+            
+            if domain in employee_domains:
+                try:
+                    user = Employee.objects.get(institutional_email=email)
+                    return user, 'employee'
+                except Employee.DoesNotExist:
+                    raise exceptions.AuthenticationFailed('User not found')
+                    
+            # Check student domain
+            elif domain == "dcstudents.edu.et":
+                try:
+                    user = Student.objects.get(institutional_email=email)
+                    return user, 'student'
+                except Student.DoesNotExist:
+                    raise exceptions.AuthenticationFailed('User not found')
+            else:
+                try:
+                    user = Guest.objects.get(email=email)
+                    return user, 'guest'
+                except Guest.DoesNotExist:
+                    raise exceptions.AuthenticationFailed('User not found')
+                    
+        except Exception as e:
+            raise exceptions.AuthenticationFailed({"error" :str(e)})
 
     @staticmethod
     def generate_token(user, user_type: str) -> Dict[str, str]:
@@ -90,18 +127,18 @@ class JWTService:
                 'is_verified': user.is_verified
             })
 
-        # Generate access token
+        # Generate access token (expires in 1 hour)
         access_token_payload = {
             **payload_data,
-            'exp': datetime.utcnow() + timedelta(minutes=60),  # 1 hour expiry
+            'exp': datetime.utcnow() + timedelta(minutes=60),
             'iat': datetime.utcnow(),
             'token_type': 'access'
         }
         
-        # Generate refresh token
+        # Generate refresh token (expires in 7 days)
         refresh_token_payload = {
             **payload_data,
-            'exp': datetime.utcnow() + timedelta(days=7),  # 7 days expiry
+            'exp': datetime.utcnow() + timedelta(days=7),
             'iat': datetime.utcnow(),
             'token_type': 'refresh'
         }
@@ -134,20 +171,24 @@ class JWTService:
             )
             return payload
         except jwt.ExpiredSignatureError:
-            raise exceptions.AuthenticationFailed('Token has expired')
+            raise jwt.ExpiredSignatureError('Token has expired')
         except jwt.InvalidTokenError:
-            raise exceptions.AuthenticationFailed('Invalid token')
+            raise exceptions.AuthenticationFailed({"error":'Invalid token'})
 
     @staticmethod
     def refresh_access_token(refresh_token: str) -> str:
         """Generate new access token using refresh token"""
         try:
-            payload = JWTService.verify_token(refresh_token)
+            # Verify the refresh token
+            payload = jwt.decode(
+                refresh_token, 
+                settings.SECRET_KEY, 
+                algorithms=['HS256']
+            )
+            if payload.get('token_type') != 'refresh':
+                raise exceptions.AuthenticationFailed('Invalid token type for refresh')
             
-            if payload['token_type'] != 'refresh':
-                raise exceptions.AuthenticationFailed('Invalid token type')
-
-            # Create new access token with same payload but new expiry
+            # Generate a new access token with updated expiry
             new_payload = {**payload}
             new_payload.update({
                 'exp': datetime.utcnow() + timedelta(minutes=60),
@@ -160,33 +201,52 @@ class JWTService:
                 settings.SECRET_KEY, 
                 algorithm='HS256'
             )
+        except jwt.ExpiredSignatureError:
+            raise exceptions.AuthenticationFailed("Refresh token has expired. Please log in again.")
         except Exception as e:
             raise exceptions.AuthenticationFailed(str(e))
 
 class JWTAuthentication(BaseAuthentication):
     """Custom authentication class for DRF"""
-
     def authenticate(self, request):
         auth_header = get_authorization_header(request).decode('utf-8')
         
         if not auth_header or 'Bearer' not in auth_header:
             return None
 
+        token = auth_header.split(' ')[1]
+
         try:
-            token = auth_header.split(' ')[1]
             payload = JWTService.verify_token(token)
-            
-            # Get user based on user_type
-            user_type = payload.get('user_type')
-            user_id = payload.get('user_id')
-            
+        except jwt.ExpiredSignatureError:
+            # Attempt to refresh the access token using the refresh token from header
+            refresh_token = request.headers.get("X-Refresh-Token")
+            if refresh_token:
+                try:
+                    new_access_token = JWTService.refresh_access_token(refresh_token)
+                    # Verify the new access token and update the payload
+                    payload = JWTService.verify_token(new_access_token)
+                    # Optionally, attach the new token to the request so the view can return it
+                    request.new_access_token = new_access_token
+                except Exception as e:
+                    raise exceptions.AuthenticationFailed("Session expired, please log in again.")
+            else:
+                raise exceptions.AuthenticationFailed("Session expired, please log in again.")
+        except Exception as e:
+            raise exceptions.AuthenticationFailed(str(e))
+
+        # Retrieve the user based on user_type and user_id from the payload
+        user_type = payload.get('user_type')
+        user_id = payload.get('user_id')
+        
+        try:
             if user_type == 'student':
                 user = Student.objects.get(id=user_id)
             elif user_type == 'employee':
                 user = Employee.objects.get(id=user_id)
             else:  # guest
                 user = Guest.objects.get(id=user_id)
-                
-            return (user, token)
-        except Exception as e:
-            raise exceptions.AuthenticationFailed(str(e))
+        except Exception:
+            raise exceptions.AuthenticationFailed("User not found")
+
+        return (user, token)

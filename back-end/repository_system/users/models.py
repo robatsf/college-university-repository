@@ -38,6 +38,7 @@ class Employee(models.Model):
     middle_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255)
     department = models.CharField(max_length=255)
+    profile_image = models.CharField(max_length=255, blank=True, null=True)
     role = models.CharField(max_length=255, choices=[("teacher", "Teacher"), ("librarian", "Librarian"), ("department_head", "Department Head")])
     email = models.EmailField(unique=True,null=True)  # Personal email
     institutional_email = models.EmailField(unique=True)  # System-generated email
