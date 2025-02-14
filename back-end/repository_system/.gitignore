@@ -6,3 +6,5 @@ db.sqlite3
 .env
 .vscode/*
 staticfiles
+media
+profile_images

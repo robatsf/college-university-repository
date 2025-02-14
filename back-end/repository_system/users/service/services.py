@@ -1,6 +1,10 @@
 from django.core.mail import send_mail
 import random
 import string
+from django.contrib.auth import get_user_model
+from users.models import Student, Employee  # Ensure this path is correct
+
+User = get_user_model()  # Ensure User is properly retrieved
 
 class EmailService:
     """Handles email-related functionality for user management"""
@@ -22,12 +26,12 @@ class EmailService:
         send_mail(subject, message, 'noreply@example.com', [email])
 
     @staticmethod
-    def send_credentials_email(first_name, email, institutional_email, password,type='Your institutional email has been created.'):
+    def send_credentials_email(first_name, email, institutional_email, password, type_msg='Your institutional email has been created.'):
         subject = "Your Institutional Email and Password"
         message = f"""
         Hello {first_name},
 
-        {type}
+        {type_msg}
 
         Email: {institutional_email}  
         Password: {password}  
@@ -37,7 +41,7 @@ class EmailService:
         Best Regards,  
         Admin Team
         """
-        send_mail(subject, message, 'noreply@example.com', [email],fail_silently=False)
+        send_mail(subject, message, 'noreply@example.com', [email], fail_silently=False)
 
 class UserUtils:
     """Utility functions for user management"""
@@ -50,16 +54,23 @@ class UserUtils:
     @staticmethod
     def generate_institutional_email(first_name, last_name, role=None):
         """
-        Generates an institutional email based on the user's role.
+        Generates a unique institutional email based on the user's role.
         """
-        username = f"{first_name.lower()[0]}{last_name.lower()}"
-        domain = {
+        domain_mapping = {
             "student": "dcstudents.edu.et",
             "teacher": "dcteacher.edu.et",
             "department_head": "dcdh.edu.et",
             "librarian": "dclibrarian.edu.et"
-        }.get(role, "default.edu.et")
+        }
+        
+        domain = domain_mapping.get(role, "default.edu.et")
 
-        return f"{username}@{domain}"
-    
-    
+        while True:
+            number = random.randint(10, 99)
+            username = f"{first_name.lower()}{last_name.lower()[0]}{number}"
+            email = f"{username}@{domain}"
+
+            # Check email uniqueness in Student and Employee models
+            if not (Student.objects.filter(institutional_email=email).exists() or 
+                    Employee.objects.filter(institutional_email=email).exists()):
+                return email
