@@ -12,7 +12,7 @@ from .models import (
     Student, Employee, Guest, Request, FileSystem, 
      Permissions, Download
 )
-from .utils import UserUtils, EmailService
+from .service.services import UserUtils, EmailService
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 
