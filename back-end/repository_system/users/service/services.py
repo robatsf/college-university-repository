@@ -37,7 +37,7 @@ class EmailService:
         Best Regards,  
         Admin Team
         """
-        send_mail(subject, message, 'noreply@example.com', [email])
+        send_mail(subject, message, 'noreply@example.com', [email],fail_silently=False)
 
 class UserUtils:
     """Utility functions for user management"""
@@ -49,17 +49,17 @@ class UserUtils:
 
     @staticmethod
     def generate_institutional_email(first_name, last_name, role=None):
-        """Generate institutional email based on user type"""
-        first_letter = first_name[0].lower()
-        last_name = last_name.lower()
-        
-        if role is None:
-            return f"{first_letter}{last_name}@dcstudents.edu.et"
-            
-        domain_map = {
+        """
+        Generates an institutional email based on the user's role.
+        """
+        username = f"{first_name.lower()[0]}{last_name.lower()}"
+        domain = {
+            "student": "dcstudents.edu.et",
             "teacher": "dcteacher.edu.et",
             "department_head": "dcdh.edu.et",
-            "librarian": "dclibrarian.edu.et",
-        }
-        domain = domain_map.get(role, "dcteacher.edu.et")
-        return f"{first_letter}{last_name}@{domain}"
+            "librarian": "dclibrarian.edu.et"
+        }.get(role, "default.edu.et")
+
+        return f"{username}@{domain}"
+    
+    

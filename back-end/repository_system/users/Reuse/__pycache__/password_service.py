@@ -1,9 +1,9 @@
 # services/password_service.py
 
 from rest_framework import exceptions
-from ..security.jwt_service import JWTService
-from ..service.services import EmailService
-from ..service.services import UserUtils
+from ...security.jwt_service import JWTService
+from ...service.services import EmailService
+from ...service.services import UserUtils
 
 class PasswordService:
     """Service for handling password reset operations"""

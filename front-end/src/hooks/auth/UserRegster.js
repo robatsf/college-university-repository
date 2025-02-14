@@ -3,11 +3,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify'; // Import toast from react-toastify
-import BackendUrl from '../config';
-import validator from '../../uites/api/APIResponseValidator';
+import { toast } from 'react-toastify';
+import { api } from '../../uites/api/APIResponseValidator'; // Import the API handler we created
 
-// Define the registration schema
 const registerSchema = z.object({
   username: z.string()
     .min(3, 'Username must be at least 3 characters')
@@ -22,17 +20,15 @@ const registerSchema = z.object({
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number')
     .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
+  confirm_password: z.string(),
+}).refine((data) => data.password === data.confirm_password, {
   message: "Passwords don't match",
-  path: ['confirmPassword'],
+  path: ['confirm_password'],
 });
 
 export const useRegisterForm = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(registerSchema),
@@ -41,14 +37,16 @@ export const useRegisterForm = () => {
       username: '',
       email: '',
       password: '',
-      confirmPassword: '',
+      confirm_password: '',
     },
   });
 
-  const watchUsername = form.watch('username');
-  const watchEmail = form.watch('email');
-  const watchPassword = form.watch('password');
-  const watchConfirmPassword = form.watch('confirmPassword');
+  const { watch, handleSubmit } = form;
+
+  const watchUsername = watch('username');
+  const watchEmail = watch('email');
+  const watchPassword = watch('password');
+  const watchConfirmPassword = watch('confirm_password');
 
   const [passwordStrength, setPasswordStrength] = useState({
     length: false,
@@ -70,48 +68,32 @@ export const useRegisterForm = () => {
     }
   }, [watchPassword]);
 
-  async function onSubmit(data) {
-    setIsLoading(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const onSubmit = async (formData) => {
     try {
-      const response = await fetch(`${BackendUrl.apiUrl}/users/register-guest/`, {
+      setIsLoading(true);    
+      const response = await api.request('users/register-guest/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: data.username,
-          email: data.email,
-          password: data.password,
-          confirm_password: data.confirmPassword,
-        }),
+        data: formData,
+        form: form, // Pass form instance for automatic error handling
+        toaster: {
+          onSuccess: (message) => {
+            toast.success(message || 'Registration successful! Verifcation Email sent');
+          },
+          onError: (message) => {
+            toast.error(message || 'Registration failed. Please try again.');
+          },
+        }
       });
-
-      const result = await validator.validateResponse(response, {
-        method: 'POST',
-        endpoint: `${BackendUrl.apiUrl}/users/register`
-      });
-
-      if (result.success) {
-        toast.success(result.message || 'Registration successful! Please login.');
-        navigate('/login');
-      } else {
-          toast.error(result.message || 'Registration failed');
-           if (result.dev) {
-                console.debug('Developer Info:', result.dev);
-            }
-      }
     } catch (error) {
-      // Handle network or other critical errors
-      const errorMessage = error.name === 'AbortError'
-        ? 'Request timed out. Please try again.'
-        : error.message === 'Failed to fetch'
-          ? 'Unable to connect to the server. Please check your connection and try again.'
-          : 'An unexpected error occurred. Please try again.';
-
-      toast.error(errorMessage);
+      // Error is already handled by the API handler
+      console.error('Registration error:', error);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return {
     form,
@@ -125,6 +107,6 @@ export const useRegisterForm = () => {
     watchPassword,
     watchConfirmPassword,
     passwordStrength,
-    onSubmit,
+    onSubmit: handleSubmit(onSubmit),
   };
 };

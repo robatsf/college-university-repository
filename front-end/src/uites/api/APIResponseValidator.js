@@ -1,170 +1,230 @@
-import { HTTP_STATUS_CODES } from './statusCode';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
 
-class APIResponseValidator {
-    constructor(isDevelopment = false) {
-        this.isDevelopment = isDevelopment;
-        this.HTTP_STATUS_CODES = HTTP_STATUS_CODES;
-        this.reset();
-    }
+export class ApiHandler {
+  constructor(defaultConfig) {
+    this.config = {
+      baseURL: defaultConfig.baseURL || 'http://localhost:8000/api',
+      timeout: defaultConfig.timeout || 15000,
+      isDevelopment: defaultConfig.isDevelopment || false,
+      setAccessToken: defaultConfig.setAccessToken || (() => {}),
+      setRefreshToken: defaultConfig.setRefreshToken || (() => {}),
+      retrieveAccessTokenFromHeader: defaultConfig.retrieveAccessTokenFromHeader || (() => null),
+      autoFetch: defaultConfig.autoFetch ?? true,
+      ...defaultConfig,
+    };
 
-    reset() {
-        this.errors = [];
-        this.success = false;
-        this.data = null;
-        this.message = "";
-        this.devInfo = {
-            timestamp: null,
-            endpoint: null,
-            method: null,
-            statusCode: null,
-            statusText: null,
-            headers: null,
-            stack: null
-        };
-    }
+    this.axiosInstance = axios.create({
+      baseURL: this.config.baseURL,
+      timeout: this.config.timeout,
+    });
 
-    /**
-     * Validates and processes an API response
-     * @param {Response} response - Fetch API Response object
-     * @param {Object} requestInfo - Additional request information
-     * @returns {Promise<Object>} Formatted response with user and developer information
-     */
-    async validateResponse(response, requestInfo = {}) {
-        try {
-            const status = response.status;
-            this.success = status >= 200 && status < 300;
+    this.setupInterceptors();
+  }
 
-            // Record developer information
-            this.devInfo = {
-                timestamp: new Date().toISOString(),
-                endpoint: response.url,
-                method: requestInfo.method || 'GET',
-                statusCode: status,
-                statusText: response.statusText,
-                headers: Object.fromEntries(response.headers.entries()),
-                stack: new Error().stack
-            };
-
-            if (this.success) {
-                this.data = await this.parseResponseData(response);
-                this.message = this.getStatusMessage(status).userMessage;
-            } else {
-                await this.handleErrorResponse(response);
-            }
-
-            return this.formatResponse();
-        } catch (error) {
-            this.success = false;
-            this.errors.push(`Error processing response: ${error.message}`);
-            this.devInfo.error = {
-                message: error.message,
-                stack: error.stack
-            };
-            return this.formatResponse();
+  setupInterceptors() {
+    this.axiosInstance.interceptors.request.use(
+      (config) => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
         }
-    }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
 
-    /**
-     * Parses response data based on content type
-     * @param {Response} response - Fetch API Response object
-     * @returns {Promise<any>} Parsed response data
-     */
-    async parseResponseData(response) {
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-            return await response.json();
+    this.axiosInstance.interceptors.response.use(
+      (response) => {
+        const newToken = this.config.retrieveAccessTokenFromHeader(response.headers);
+        if (newToken) {
+          this.config.setAccessToken(newToken);
         }
-        return await response.text();
-    }
-
-    /**
-     * Handles error responses and extracts meaningful error messages
-     * @param {Response} response - Fetch API Response object
-     */
-    async handleErrorResponse(response) {
-        const status = response.status;
-        this.message = this.getStatusMessage(status).userMessage;
-
-        try {
-            const errorData = await response.json();
-            
-            if (typeof errorData === 'object') {
-                if (errorData.detail) {
-                    this.errors.push(errorData.detail);
-                } else if (errorData.errors) {
-                    this.errors = Array.isArray(errorData.errors) 
-                        ? errorData.errors 
-                        : [errorData.errors];
-                } else {
-                    Object.entries(errorData).forEach(([field, errors]) => {
-                        if (Array.isArray(errors)) {
-                            errors.forEach(error => {
-                                this.errors.push(`${this.formatFieldName(field)}: ${error}`);
-                            });
-                        } else {
-                            this.errors.push(`${this.formatFieldName(field)}: ${errors}`);
-                        }
-                    });
-                }
-            } else if (Array.isArray(errorData)) {
-                this.errors = errorData;
-            } else {
-                this.errors.push(String(errorData));
-            }
-        } catch (error) {
-            const errorText = await response.text();
-            this.errors.push(errorText || "No error details available");
-        }
-    }
-
-    /**
-     * Gets status message information for a given status code
-     * @param {number} status - HTTP status code
-     * @returns {Object} Status message information
-     */
-    getStatusMessage(status) {
-        return this.HTTP_STATUS_CODES[status] || {
-            name: 'Unknown Status',
-            userMessage: 'An unknown error occurred',
-            devMessage: `Unknown status code: ${status}`
-        };
-    }
-
-    /**
-     * Formats the field name for user display
-     * @param {string} field - The field name to format
-     * @returns {string} Formatted field name
-     */
-    formatFieldName(field) {
-        return field
-            .split('_')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-    }
-
-    /**
-     * Formats the response including developer information when in development mode
-     * @returns {Object} Formatted response
-     */
-    formatResponse() {
-        const response = {
-            success: this.success,
-            data: this.success ? this.data : null,
-            message: this.message,
-            errors: this.success ? [] : this.errors
-        };
-
-        if (this.isDevelopment) {
-            response.dev = {
-                ...this.devInfo,
-                statusInfo: this.getStatusMessage(this.devInfo.statusCode)
-            };
-        }
-
         return response;
+      },
+      async (error) => {
+        if (error.response?.status === 401) {
+          try {
+            const refreshToken = localStorage.getItem('refresh_token');
+            if (refreshToken) {
+              const response = await this.axiosInstance.post('/auth/refresh', {
+                refresh_token: refreshToken,
+              });
+              const newAccessToken = response.data.access_token;
+              this.config.setAccessToken(newAccessToken);
+              
+              const originalRequest = error.config;
+              if (originalRequest) {
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                return this.axiosInstance(originalRequest);
+              }
+            }
+          } catch (refreshError) {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            window.location.href = '/login';
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  handleFormErrors(errors, form, toaster) {
+    if (!form || !errors) return;    
+    try {
+      Object.entries(errors[0]).forEach(([field, messages]) => {
+        const message = Array.isArray(messages) ? messages[0] : messages;
+        const cleanMessage = message.replace(/^"|"$/g, '');
+    
+        form.setError(field, { message: cleanMessage });
+        // and with toster
+        toaster.onError(cleanMessage);
+  
+        const element = document.querySelector(`[name="${field}"]`);
+        if (element) {
+          element.classList.add('border-red-500');
+        }
+      });
+  
+    } catch (e) {
+      console.error('Error parsing form errors:', e);
+      if (toaster?.onError) {
+        toaster.onError('An error occurred during form submission');
+      }
     }
+  }
+
+  handleError(error, options) {
+    const errors = error.response?.data?.errors;
+    
+    if (options?.form && errors) {
+      this.handleFormErrors(errors, options.form, options.toaster);
+    }
+
+    const errorMessage = error.response?.data?.message || 'An error occurred';
+  
+    if (options?.toaster?.onError) {
+      options.toaster.onError(errorMessage);
+    }
+  
+    if (this.config.isDevelopment) {
+      console.error('API Error:', error);
+    }
+  
+    return errorMessage;
+  }
+
+  clearFormErrors(form) {
+    if (!form) return;
+    
+    form.clearErrors();
+    const formFields = Object.keys(form.getValues());
+    formFields.forEach(field => {
+      const element = document.querySelector(`[name="${field}"]`);
+      if (element) {
+        element.classList.remove('border-red-500');
+        const errorDiv = element.parentElement.querySelector('.error-message');
+        if (errorDiv) errorDiv.remove();
+      }
+    });
+  }
+
+  async request(endpoint, options = {}) {
+    try {
+      if (options.form) {
+        this.clearFormErrors(options.form);
+      }
+
+      const response = await this.axiosInstance({
+        url: endpoint,
+        method: options.method || 'GET',
+        headers: options.headers,
+        params: options.params,
+        data: options.data,
+      });
+
+      return this.handleSuccess(response, options);
+    } catch (error) {
+      const errorMessage = this.handleError(error, options);
+      throw new Error(errorMessage);
+    }
+  }
+  handleSuccess(response, options) {
+    if (!response) return null;
+
+    const successData = {
+      data:response.data || null,
+      message: response.data.message || 'Success',
+      main : response
+    };
+  
+    if (options?.toaster?.onSuccess) {
+      options.toaster.onSuccess(successData.message);
+    }
+  
+    return successData.data;
+  }
 }
 
-const validator = new APIResponseValidator(true);
 
-export default validator;
+
+export const useApiRequest = (api, endpoint, options = {}) => {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      if (options.form) {
+        api.clearFormErrors(options.form);
+      }
+
+      const response = await api.axiosInstance({
+        url: endpoint,
+        method: options.method || 'GET',
+        headers: options.headers,
+        params: options.params,
+        data: options.data,
+        signal: options.signal,
+      });
+
+      setData(response.data);
+
+      if (options.toaster?.onSuccess) {
+        options.toaster.onSuccess(response.data?.message || 'Success');
+      }
+    } catch (error) {
+      const errorMessage = api.handleError(error, options);
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (api.config.autoFetch) {
+      fetchData();
+    }
+  }, [endpoint]);
+
+  return {
+    data,
+    isLoading,
+    error,
+    refetch: fetchData,
+  };
+};
+
+export const api = new ApiHandler({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  isDevelopment: import.meta.env.DEV || false,
+  timeout: 15000,
+  setAccessToken: (token) => localStorage.setItem('access_token', token),
+  setRefreshToken: (token) => localStorage.setItem('refresh_token', token),
+  retrieveAccessTokenFromHeader: (headers) => headers['new-access-token'],
+  autoFetch: true,
+});

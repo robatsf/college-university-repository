@@ -219,7 +219,7 @@ export default function Register() {
             {/* Confirm Password Field */}
             <FormField
               control={form.control}
-              name="confirmPassword"
+              name="confirm_password"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm text-gray-700 dark:text-gray-300">
