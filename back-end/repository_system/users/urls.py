@@ -1,7 +1,10 @@
 from django.urls import path
-from .views import GuestRegistrationView, VerifyGuestView, StudentRegistrationView, EmployeeRegistrationView
-from .security.views.auth_views import LoginView
-from .security.views.password_views import PasswordResetView
+from .view.GuestRegistertionViwe import GuestRegistrationView
+from .view.VerifyGuestView import  VerifyGuestView
+from .view.StudentRegistrationView import StudentRegistrationView
+from .view.EmployeeRegistrationView import  EmployeeRegistrationView
+from .view.Login_views import LoginView
+from .view.password_views import PasswordResetView
 
 urlpatterns = [
     path('register-guest/', GuestRegistrationView.as_view(), name='register-guest'),

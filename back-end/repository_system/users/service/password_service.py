@@ -1,10 +1,9 @@
 # services/password_service.py
 
 from rest_framework import exceptions
-from ..models import Student, Employee, Guest
 from ..security.jwt_service import JWTService
-from .services import EmailService
-from .services import UserUtils
+from ..service.services import EmailService
+from ..service.services import UserUtils
 
 class PasswordService:
     """Service for handling password reset operations"""
@@ -13,22 +12,14 @@ class PasswordService:
     def reset_password(email: str) -> dict:
         """Reset user password and send temporary password via email"""
         try:
-            # Reuse JWTService's get_user_by_email method to find user
             user, user_type = JWTService.get_user_by_email(email)
-            
-            # Reuse UserUtils's generate_password method
             temp_password = UserUtils.generate_password()
-            
-            # Update user password
             user.password = UserUtils.generate_password(temp_password)
-            
-            # For employees and students, set flag to change password
             if hasattr(user, 'ask_for_forget_password'):
                 user.ask_for_forget_password = True
             
             user.save()
-            
-            # Use EmailService to send the temporary password
+
             EmailService.send_credentials_email(
                 first_name=user.first_name if hasattr(user, 'first_name') else user.username,
                 email=email,
