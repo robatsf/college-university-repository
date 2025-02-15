@@ -4,7 +4,7 @@ from django.utils.html import format_html
 from django.urls import path
 from django.db.models.functions import TruncMonth
 from django.db.models import Sum
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib.admin import SimpleListFilter
 import json
 from datetime import datetime, timedelta
@@ -15,6 +15,7 @@ from .models import (
 from .service.services import UserUtils, EmailService
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
+from users.service.services import UserUtils, EmailService
 
 # Custom Filters
 class DepartmentFilter(SimpleListFilter):
@@ -98,11 +99,78 @@ def status_indicator(self, obj):
         status_indicator.short_description = 'Status'
 
 @admin.register(Employee)
-class EmployeeAdmin(BaseModelAdmin):
-    list_display = ('first_name', 'last_name', 'department', 'role', 'email')
-    list_filter = (DepartmentFilter, 'role')
-    search_fields = ('first_name', 'last_name', 'email')
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'department', 'role', 'email', 'institutional_email', 'status_indicator', 'toggle_activation_button')
+    list_filter = ('department', 'role')
+    search_fields = ('first_name', 'last_name', 'email', 'institutional_email')
     ordering = ('-created_at',)
+
+    fieldsets = (
+        ('Personal Information', {
+            'fields': ('first_name', 'middle_name', 'last_name', 'profile_image')  # No institutional email or password
+        }),
+        ('Employment Details', {
+            'fields': ('department', 'role', 'email')  # Only normal email entered
+        }),
+    )
+    def status_indicator(self, obj):
+        """Show a status indicator in the list display"""
+        if obj.is_active:
+            return format_html('<span style="color: green;">✓ Active</span>')
+        return format_html('<span style="color: red;">✖ Inactive</span>')
+    
+    status_indicator.short_description = 'Status'
+
+    def toggle_activation_button(self, obj):
+        """Display an activate/deactivate button in the admin panel."""
+        if obj.is_active:
+            return format_html('<a class="button" href="{}">Deactivate</a>', f'toggle-activation/{obj.id}')
+        else:
+            return format_html('<a class="button" href="{}">Activate</a>', f'toggle-activation/{obj.id}')
+    
+    toggle_activation_button.allow_tags = True
+    toggle_activation_button.short_description = 'Activation'
+
+    def get_urls(self):
+        """Add a custom URL for toggling activation."""
+        urls = super().get_urls()
+        custom_urls = [
+            path('toggle-activation/<uuid:employee_id>/', self.toggle_activation, name='toggle-activation'),
+        ]
+        return custom_urls + urls
+
+    def toggle_activation(self, request, employee_id):
+        """Toggle the is_active status for an employee."""
+        employee = Employee.objects.filter(id=employee_id).first()
+        if not employee:
+            messages.error(request, "Employee not found.")
+            return redirect("..")  # Redirect back to admin list
+
+        employee.is_active = not employee.is_active
+        employee.save()
+
+        messages.success(request, f"{employee.first_name} {employee.last_name} has been {'activated' if employee.is_active else 'deactivated'}.")
+        return redirect("..")  # Redirect back to employee list
+    def save_model(self, request, obj, form, change):
+        """
+        Override save_model to generate institutional email, password, and send credentials.
+        """
+        if not obj.institutional_email:  # Generate institutional email only if it doesn't exist
+            obj.institutional_email = UserUtils.generate_institutional_email(obj.first_name, obj.last_name, obj.role)
+
+        plain_password = UserUtils.generate_password()  # Generate password
+        obj.password = make_password(plain_password)  # Hash password before saving
+
+        super().save_model(request, obj, form, change)  # Save employee instance
+
+        # Send email with credentials
+        try:
+            EmailService.send_credentials_email(obj.first_name, obj.email, obj.institutional_email, plain_password)
+            self.message_user(request, f"Credentials sent to {obj.email}.", messages.SUCCESS)
+        except Exception as e:
+            self.message_user(request, f"Error sending email: {str(e)}", messages.ERROR)
+
+
 
 # @admin.register(FileSystem)
 # class FileSystemAdmin(BaseModelAdmin):
