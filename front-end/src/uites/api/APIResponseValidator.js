@@ -121,6 +121,7 @@ export class ApiHandler {
     form.clearErrors();
     const formFields = Object.keys(form.getValues());
     formFields.forEach(field => {
+
       const element = document.querySelector(`[name="${field}"]`);
       if (element) {
         element.classList.remove('border-red-500');
@@ -156,7 +157,8 @@ export class ApiHandler {
     const successData = {
       data:response.data || null,
       message: response.data.message || 'Success',
-      main : response
+      main : response,
+      status : true
     };
   
     if (options?.toaster?.onSuccess) {
@@ -222,7 +224,7 @@ export const useApiRequest = (api, endpoint, options = {}) => {
 export const api = new ApiHandler({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
   isDevelopment: import.meta.env.DEV || false,
-  timeout: 15000,
+  timeout: 150000,
   setAccessToken: (token) => localStorage.setItem('access_token', token),
   setRefreshToken: (token) => localStorage.setItem('refresh_token', token),
   retrieveAccessTokenFromHeader: (headers) => headers['new-access-token'],

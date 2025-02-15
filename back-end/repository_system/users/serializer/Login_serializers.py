@@ -1,6 +1,5 @@
 from rest_framework import serializers, status
 from ..security.jwt_service import JWTService
-from ..Reuse.ResponseStructure import ResponseStructure
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -12,20 +11,12 @@ class LoginSerializer(serializers.Serializer):
                 data['email'],
                 data['password']
             )
-            
-            tokens = JWTService.generate_token(user, user_type)
-            
-            return ResponseStructure.success(
-                data={
-                    'user_type': user_type,
-                    'tokens': tokens
-                },
-                message="Login successful",
-                status_code=status.HTTP_200_OK
-            )
+
+            tokens_response = JWTService.generate_tokens(user, user_type)
+            tokens = tokens_response.data.get("data", {})
+            return {
+                'user_type': user_type,
+                'tokens': tokens
+            }
         except Exception as e:
-            return ResponseStructure.error(
-                message="Login failed",
-                errors=[str(e)],
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
+            raise serializers.ValidationError({"errors": e.args,"message" : "Login Failed"})

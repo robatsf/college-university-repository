@@ -2,9 +2,9 @@
 
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from ..serializer.Login_serializers import LoginSerializer # TokenRefreshSerializer
+from ..serializer.Login_serializers import LoginSerializer
+from ..Reuse.ResponseStructure import ResponseStructure   
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -13,5 +13,8 @@ class LoginView(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        return ResponseStructure.success(
+            data=serializer.validated_data,
+            message="Login successful",
+            status_code=status.HTTP_200_OK
+        )
