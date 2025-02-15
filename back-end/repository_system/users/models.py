@@ -20,6 +20,7 @@ class Student(models.Model):
     history_id = models.UUIDField(default=uuid.uuid4, editable=False )
     created_at = models.DateTimeField(default=now)
     updated_time = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)  # Default: Active
 
     def save(self, *args, **kwargs):
         """Generate institutional email and hash password before saving."""

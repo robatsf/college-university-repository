@@ -17,18 +17,25 @@ class LoginView(APIView):
         email = serializer.validated_data.get("email")
         password = serializer.validated_data.get("password")
         user = None
-        role = "student"  # Default role
+        role = "student"
 
         # Check if user is a Student
         if Student.objects.filter(institutional_email=email).exists():
             user = Student.objects.get(institutional_email=email)
+
+            # Block inactive students
+            if not user.is_active:
+                return Response(
+                    {"error": "Your account has been deactivated. Please contact the administrator."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
         # Check if user is an Employee
         elif Employee.objects.filter(institutional_email=email).exists():
             user = Employee.objects.get(institutional_email=email)
             role = getattr(user, "role", "employee")
 
-            # If Employee is inactive, deny login
+            # Block inactive employees
             if not user.is_active:
                 return Response(
                     {"error": "Your account has been deactivated. Please contact the administrator."},
