@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models import Count
 from django.utils.html import format_html
-from django.urls import path
+from django.urls import path, reverse
 from django.db.models.functions import TruncMonth
 from django.db.models import Sum
 from django.shortcuts import redirect, render
@@ -43,7 +43,7 @@ class BaseModelAdmin(admin.ModelAdmin):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'department','profile_image_preview', 'year', 'email', 'institutional_email', 'status_indicator')
+    list_display = ('first_name', 'last_name', 'department','profile_image_preview', 'year', 'email', 'institutional_email', 'status_indicator','toggle_activation_button')
     list_filter = ('year', 'department')
     search_fields = ('first_name', 'last_name', 'email', 'institutional_email')
     ordering = ('-created_at',)
@@ -64,12 +64,44 @@ class StudentAdmin(admin.ModelAdmin):
         }),
     )
 
-    def status_indicator(self, obj):
-        if obj.ask_for_forget_password:
-            return format_html('<span style="color: red;">⚠️ Password Reset Requested</span>')
-        return format_html('<span style="color: green;">✓ Active</span>')
+    # def status_indicator(self, obj):
+    #     if obj.ask_for_forget_password:
+    #         return format_html('<span style="color: red;">⚠️ Password Reset Requested</span>')
+    #     return format_html('<span style="color: green;">✓ Active</span>')
     
-    status_indicator.short_description = 'Status'
+    # status_indicator.short_description = 'Status'
+
+    def status_indicator(self, obj):
+        color = "green" if obj.is_active else "red"
+        status_text = "Active" if obj.is_active else "Inactive"
+        return format_html(f'<span style="color: {color};">{status_text}</span>')
+    status_indicator.short_description = "Status"
+
+    def toggle_activation_button(self, obj):
+        """Add an activation/deactivation button next to each student."""
+        action = "deactivate" if obj.is_active else "activate"
+        url = reverse('admin:toggle_student_activation', args=[obj.id])
+        color = "red" if obj.is_active else "green"
+        return format_html(f'<a href="{url}" style="color: {color}; font-weight: bold;">{action.capitalize()}</a>')
+    toggle_activation_button.short_description = "Activation"
+
+    def get_urls(self):
+        """Add custom URL for activation toggling."""
+        urls = super().get_urls()
+        custom_urls = [
+            path('toggle-activation/<uuid:student_id>/', self.toggle_activation, name='toggle_student_activation'),
+        ]
+        return custom_urls + urls
+
+    def toggle_activation(self, request, student_id):
+        """Handle activation and deactivation of students."""
+        student = Student.objects.get(id=student_id)
+        student.is_active = not student.is_active
+        student.save()
+
+        status_msg = "activated" if student.is_active else "deactivated"
+        self.message_user(request, f"Student {student.first_name} has been {status_msg}.", messages.SUCCESS)
+        return redirect(request.META.get('HTTP_REFERER', 'admin:users_student_changelist'))
 
     def save_model(self, request, obj, form, change):
         """
@@ -114,43 +146,37 @@ class EmployeeAdmin(admin.ModelAdmin):
         }),
     )
     def status_indicator(self, obj):
-        """Show a status indicator in the list display"""
-        if obj.is_active:
-            return format_html('<span style="color: green;">✓ Active</span>')
-        return format_html('<span style="color: red;">✖ Inactive</span>')
-    
-    status_indicator.short_description = 'Status'
+        color = "green" if obj.is_active else "red"
+        status_text = "Active" if obj.is_active else "Inactive"
+        return format_html(f'<span style="color: {color};">{status_text}</span>')
+    status_indicator.short_description = "Status"
 
     def toggle_activation_button(self, obj):
-        """Display an activate/deactivate button in the admin panel."""
-        if obj.is_active:
-            return format_html('<a class="button" href="{}">Deactivate</a>', f'toggle-activation/{obj.id}')
-        else:
-            return format_html('<a class="button" href="{}">Activate</a>', f'toggle-activation/{obj.id}')
-    
-    toggle_activation_button.allow_tags = True
-    toggle_activation_button.short_description = 'Activation'
+        """Add an activation/deactivation button next to each employee."""
+        action = "deactivate" if obj.is_active else "activate"
+        url = reverse('admin:toggle_employee_activation', args=[obj.id])
+        color = "red" if obj.is_active else "green"
+        return format_html(f'<a href="{url}" style="color: {color}; font-weight: bold;">{action.capitalize()}</a>')
+    toggle_activation_button.short_description = "Activation"
 
     def get_urls(self):
-        """Add a custom URL for toggling activation."""
+        """Add custom URL for activation toggling."""
         urls = super().get_urls()
         custom_urls = [
-            path('toggle-activation/<uuid:employee_id>/', self.toggle_activation, name='toggle-activation'),
+            path('toggle-activation/<uuid:employee_id>/', self.toggle_activation, name='toggle_employee_activation'),
         ]
         return custom_urls + urls
 
     def toggle_activation(self, request, employee_id):
-        """Toggle the is_active status for an employee."""
-        employee = Employee.objects.filter(id=employee_id).first()
-        if not employee:
-            messages.error(request, "Employee not found.")
-            return redirect("..")  # Redirect back to admin list
-
+        """Handle activation and deactivation of students."""
+        employee = Employee.objects.get(id=employee_id)
         employee.is_active = not employee.is_active
         employee.save()
 
-        messages.success(request, f"{employee.first_name} {employee.last_name} has been {'activated' if employee.is_active else 'deactivated'}.")
-        return redirect("..")  # Redirect back to employee list
+        status_msg = "activated" if employee.is_active else "deactivated"
+        self.message_user(request, f"Employee {employee.first_name} has been {status_msg}.", messages.SUCCESS)
+        return redirect(request.META.get('HTTP_REFERER', 'admin:users_employee_changelist'))
+    
     def save_model(self, request, obj, form, change):
         """
         Override save_model to generate institutional email, password, and send credentials.
