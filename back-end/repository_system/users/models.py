@@ -38,7 +38,7 @@ class Employee(models.Model):
     middle_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255)
     department = models.CharField(max_length=255)
-    profile_image = models.CharField(max_length=255, blank=True, null=True)
+    profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     role = models.CharField(max_length=255, choices=[("teacher", "Teacher"), ("librarian", "Librarian"), ("department_head", "Department Head")])
     email = models.EmailField(unique=True,null=True)  # Personal email
     institutional_email = models.EmailField(unique=True)  # System-generated email
@@ -46,6 +46,7 @@ class Employee(models.Model):
     history_id = models.UUIDField( default=uuid.uuid4 ,editable=False)
     created_at = models.DateTimeField(default=now)
     updated_time = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)  # ✅ Track employee activation status
 
     def save(self, *args, **kwargs):
         """Generate institutional email based on role and hash password before saving."""

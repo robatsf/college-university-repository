@@ -1,6 +1,7 @@
 from .base_user_serializer import BaseUserRegistrationSerializer
 from ..models import Student, Employee
 from rest_framework import serializers, status
+from users.service.services import UserUtils, EmailService
 
 class StudentRegistrationSerializer(BaseUserRegistrationSerializer):
     class Meta:
