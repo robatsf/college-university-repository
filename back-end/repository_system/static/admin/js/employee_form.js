@@ -30,7 +30,8 @@ $(document).ready(function() {
                     type: 'text',
                     id: 'id_department_input',
                     name: 'department',
-                    placeholder: 'Enter department name'
+                    placeholder: 'Enter department name',
+                    readonly: false// Makes the input read-only
                 }).css('display', 'block');
                 // Insert the text input after the select element
                 $('#id_department_select').after($input);
