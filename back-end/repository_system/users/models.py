@@ -20,6 +20,7 @@ class Student(models.Model):
     history_id = models.UUIDField(default=uuid.uuid4, editable=False )
     created_at = models.DateTimeField(default=now)
     updated_time = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)  # Default: Active
 
     def save(self, *args, **kwargs):
         """Generate institutional email and hash password before saving."""
@@ -38,7 +39,7 @@ class Employee(models.Model):
     middle_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255)
     department = models.CharField(max_length=255)
-    profile_image = models.CharField(max_length=255, blank=True, null=True)
+    profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     role = models.CharField(max_length=255, choices=[("teacher", "Teacher"), ("librarian", "Librarian"), ("department_head", "Department Head")])
     email = models.EmailField(unique=True,null=True)  # Personal email
     institutional_email = models.EmailField(unique=True)  # System-generated email
@@ -46,6 +47,7 @@ class Employee(models.Model):
     history_id = models.UUIDField( default=uuid.uuid4 ,editable=False)
     created_at = models.DateTimeField(default=now)
     updated_time = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)  # ✅ Track employee activation status
 
     def save(self, *args, **kwargs):
         """Generate institutional email based on role and hash password before saving."""
@@ -74,6 +76,7 @@ class Guest(models.Model):
     email_verification_token = models.CharField(max_length=100, unique=True, blank=True, null=True) 
     created_at = models.DateTimeField(default=now)
     updated_time = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)  
 
 # ------------------- REQUEST TABLE -------------------
 class Request(models.Model):
@@ -83,6 +86,18 @@ class Request(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
     description = models.CharField(max_length=255)
     status = models.CharField(max_length=50)
+
+
+# ------------------- DepartmentList TABLE -------------------
+class DepartmentList(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255, unique=True)
+    file_count = models.PositiveIntegerField(default=0)
+    download_total = models.PositiveIntegerField(default=0)
+    history_total = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.name
 
 # ------------------- FILE SYSTEM TABLE -------------------
 class FileSystem(models.Model):
@@ -94,6 +109,10 @@ class FileSystem(models.Model):
     location = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(default=now)
     updated_time = models.DateTimeField(auto_now=True)
+    department = models.ForeignKey(DepartmentList, on_delete=models.CASCADE, related_name='files', null=True, blank=True)
+
+    def __str__(self):
+        return self.title
 
 # ------------------- HISTORY TABLE -------------------
 class History(models.Model):

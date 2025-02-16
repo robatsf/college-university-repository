@@ -46,7 +46,9 @@ class JWTService:
 
         if user_type == "guest" and not user.is_verified:
             raise serializers.ValidationError({"email": "Email not verified"})
-
+        if not user.is_active:
+          raise serializers.ValidationError({"email": "Your Email Has been Deactive contact the adminstration!"})
+    
         return user, user_type
     @staticmethod
     def Verify_user_by_email(email: str):

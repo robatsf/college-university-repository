@@ -1,10 +1,9 @@
-# views/auth_views.py
-
-from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from ..serializer.Login_serializers import LoginSerializer
-from ..Reuse.ResponseStructure import ResponseStructure   
+from ..Reuse.ResponseStructure import ResponseStructure
+from rest_framework import status  
+
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
