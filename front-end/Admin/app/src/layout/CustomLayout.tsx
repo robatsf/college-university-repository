@@ -13,22 +13,24 @@ import {
   FileList, 
   FileCreate, 
   FileEdit,
-} from "../components/librianiesFiles";
+} from "../libriance/librianiesFiles";
 import { 
   DepartmentFileList, 
   DepartmentFileCreate ,
   DepartmentFileEdit
-} from "../components/DepartmentFiles";
+} from "../departemnt_head/DepartmentFiles";
 import { 
   ApprovalList, 
   ApprovalShow 
-} from "../components/Approvals";
-import { 
-  StatisticsList 
-} from "../components/Statistics";
+} from "../departemnt_head/Approvals";
+// import { 
+//   StatisticsList 
+// } from "../components/Statistics";
+
 import { ThemeProvider,createTheme } from '@mui/material/styles';
 import { Layout, LayoutProps  } from 'react-admin';
-import {UpdatePasswordEdit} from '../components/Updatepassword'
+import {UpdateLibriancePassword} from '../libriance/Updatepassword'
+import {UpdateDepartemntPassword} from '../departemnt_head/Updatepassword'
 
 const roleResources = {
   librarian: [
@@ -46,7 +48,7 @@ const roleResources = {
     <Resource
       key="updatePassword"
       name="updatePassword"
-      list={UpdatePasswordEdit}
+      list={UpdateLibriancePassword}
       icon={Lock}
       options={{ 
         label: 'Update Password',
@@ -87,7 +89,7 @@ const roleResources = {
     <Resource
       key="updatePassword"
       name="updatePassword"
-      list={UpdatePasswordEdit}
+      list={UpdateDepartemntPassword}
       icon={Lock}
       options={{ 
         label: 'Update Password',

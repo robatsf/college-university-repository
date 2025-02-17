@@ -33,7 +33,7 @@ const CustomToolbar = props => (
   </Toolbar>
 );
 
-export const UpdatePasswordEdit = () => {
+export const UpdateLibriancePassword = () => {
   const notify = useNotify();
   const redirect = useRedirect();
 
@@ -44,7 +44,6 @@ export const UpdatePasswordEdit = () => {
 
   return (
     <Box>
-
         <CardContent>
           <Typography >
             Update Password
