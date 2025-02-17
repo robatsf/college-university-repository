@@ -56,7 +56,8 @@ JAZZMIN_SETTINGS = {
         "Authentication.Librarian": "fas fa-book-reader",       # Librarian model
         "Authentication.DepartmentHead": "fas fa-chalkboard-teacher",
         "Files.Permissions": "fas fa-user-shield",
-        "Files.RequestAdmin": "fas fa-user-cog"
+        "Files.RequestAdmin": "fas fa-user-cog",
+        "Files.Departmentlist": "fas fa-clipboard-list"
 
     },
 
