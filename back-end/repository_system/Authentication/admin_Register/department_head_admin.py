@@ -3,6 +3,10 @@ from django.urls import path, reverse
 from django.utils.html import format_html
 from django.shortcuts import redirect
 from ..models import DepartmentHead
+from Files.models import DepartmentList
+from django.core.exceptions import ValidationError
+from Authentication.service.services import UserUtils,EmailService
+from django.contrib.auth.hashers import make_password
 
 class ProfileImagePreviewMixin:
     def profile_image_preview(self, obj):
@@ -99,3 +103,32 @@ class DepartmentHeadAdmin(admin.ModelAdmin, ProfileImagePreviewMixin, StatusIndi
             return obj.department_id.name
         return obj.department
     department_name.short_description = "Department"
+
+    def save_model(self, request, obj, form, change):
+        is_new = not change
+
+        if not obj.department_id:
+            department, created = DepartmentList.objects.get_or_create(name=obj.department)
+            obj.department_id = department
+
+        if is_new:
+            obj.institutional_email = UserUtils.generate_institutional_email(
+                obj.first_name, obj.last_name, role="department_head"
+            )
+            plain_password = UserUtils.generate_password()
+            obj.password = make_password(plain_password)
+
+            try:
+                EmailService.send_credentials_email(
+                    obj.first_name,
+                    obj.email,
+                    obj.institutional_email,
+                    plain_password,
+                    'Your Hudc institutional email as departemnt head  has been created.'
+                )
+                self.message_user(request, f"Credentials sent to {obj.email}.", messages.SUCCESS)
+            except Exception as e:
+                self.message_user(request, f"Error sending email: {e}", messages.ERROR)
+
+        super().save_model(request, obj, form, change)
+

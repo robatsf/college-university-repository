@@ -2,7 +2,7 @@ from django.core.mail import send_mail
 import random
 import string
 from django.contrib.auth import get_user_model
-from ..models import Student, Teacher, DepartmentHead, Librarian
+from Authentication.models import Student, Teacher, DepartmentHead, Librarian
 # from users.models import Student, Employee  # Ensure this path is correct
 
 User = get_user_model()  # Ensure User is properly retrieved

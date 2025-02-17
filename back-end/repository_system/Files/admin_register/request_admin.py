@@ -1,7 +1,7 @@
 # your_app/admin/request_admin.py
 
 from django.contrib import admin
-from users.admin_Register.base_admin import BaseModelAdmin
+from .base_admin import BaseModelAdmin
 from ..models import Request
 
 
