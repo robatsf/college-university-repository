@@ -25,6 +25,7 @@ const FileFilter = (props) => (
     <TextInput label="Author" source="author" />
     <TextInput label="File Name" source="filename" />
     <TextInput label="Department" source="Department" />
+    <TextInput label="status" source="status" />
   </Filter>
 );
 

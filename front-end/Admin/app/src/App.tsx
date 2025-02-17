@@ -4,7 +4,8 @@ import { Box, Typography } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {roleResources,CustomLayout} from './layout/CustomLayout';
 import { dataProvider } from './dataProvider';
-import DashboardComponent from './components/DashboardComponent';
+import LibrarianDashboard from './libriance/LibrarianDashboard';
+import DepartmentDashboard from './departemnt_head/DepartmentDashboard';
 
 // Custom AppBar component that extends react-admin's AppBar
 const CustomAppBar = (props: AppBarProps) => (
@@ -60,7 +61,7 @@ const customTheme = createTheme({
 // App component
 const App = () => {
   // librarian,departmentHead
-  const role = localStorage.getItem("role") || "departmentHead";
+  const role = localStorage.getItem("role") || "librarian";
   const resources = roleResources[role] || [];
 
   return (
@@ -69,13 +70,12 @@ const App = () => {
       layout={CustomLayout}
       dataProvider={dataProvider}
       darkTheme={null}
-      // dashboard={DashboardComponent}
-      dashboard={() => <DashboardComponent role={role} />}
+      dashboard={role === "departmentHead" ? DepartmentDashboard : LibrarianDashboard}
     >
-      
       {resources}
     </Admin>
   );
+  
 };
 
 export default App;
