@@ -38,21 +38,26 @@ JAZZMIN_SETTINGS = {
     # The keys follow the format "app_label.modelname" (use lower-case for the model name).
     "icons": {
         # Built-in auth app
-        "auth": "fas fa-users-cog",
+        "auth": "fas fa-user-cog",
         "auth.user": "fas fa-user",
-        "auth.group": "fas fa-users",
+        "auth.group": "fas fa-user",
         
-        # Custom 'users' app models:
-        "users.student": "fas fa-user-graduate",    # Student model
-        "users.employee": "fas fa-user-tie",          # Employee model
-        "users.guest": "fas fa-user-secret",          # Guest model
-        "users.request": "fas fa-envelope-open-text", # Request model
-        "users.filesystem": "fas fa-folder-open",     # FileSystem model
-        "users.history": "fas fa-history",            # History model
-        "users.permissions": "fas fa-key",            # Permissions model
-        "users.notification": "fas fa-bell",          # Notification model
-        "users.download": "fas fa-download",          # Download model
-        "users.admin": "fas fa-user-shield",          # Admin model
+        # Custom 'Authentication' app models:
+        "Authentication.student": "fas fa-user-graduate",    # Student model
+        "Authentication.Teacher": "fas fa-user-tie", 
+        "Authentication.guest": "fas fa-user-secret",          # Guest model
+        "Authentication.request": "fas fa-envelope-open-text", # Request model
+        "Authentication.filesystem": "fas fa-folder-open",     # FileSystem model
+        "Authentication.history": "fas fa-history",            # History model
+        "Authentication.permissions": "fas fa-key",            # Permissions model
+        "Authentication.notification": "fas fa-bell",          # Notification model
+        "Authentication.download": "fas fa-download",          # Download model
+        "Authentication.admin": "fas fa-user-shield",          # Admin model
+        "Authentication.Librarian": "fas fa-book-reader",       # Librarian model
+        "Authentication.DepartmentHead": "fas fa-chalkboard-teacher",
+        "Files.Permissions": "fas fa-user-shield",
+        "Files.RequestAdmin": "fas fa-user-cog"
+
     },
 
     # Default icons when one is not manually specified
