@@ -4,7 +4,7 @@ from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from Files.models import DepartmentList
+from files.models import DepartmentList
 
 # ------------------- STUDENT TABLE -------------------
 class Student(models.Model):
