@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 from django.shortcuts import redirect
 from django import forms
 from ..models import Student
-from Files.models import DepartmentList
+from files.models import DepartmentList
 from ..service.services import UserUtils, EmailService
 
 @admin.register(Student)

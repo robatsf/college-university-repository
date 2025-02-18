@@ -1,5 +1,5 @@
 from django.contrib import admin
-from Files.models import DepartmentList
+from files.models import DepartmentList
 from .base_admin import BaseModelAdmin
 
 @admin.register(DepartmentList)

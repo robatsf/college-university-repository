@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from ..models import Teacher
 from Authentication.service.services import UserUtils,EmailService
 from django.contrib.auth.hashers import make_password
-from Files.models import DepartmentList
+from files.models import DepartmentList
 
 # Mixins for common admin functionality
 class ProfileImagePreviewMixin:

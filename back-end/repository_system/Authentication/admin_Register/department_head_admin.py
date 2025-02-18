@@ -3,7 +3,7 @@ from django.urls import path, reverse
 from django.utils.html import format_html
 from django.shortcuts import redirect
 from ..models import DepartmentHead
-from Files.models import DepartmentList
+from files.models import DepartmentList
 from django.core.exceptions import ValidationError
 from Authentication.service.services import UserUtils,EmailService
 from django.contrib.auth.hashers import make_password
