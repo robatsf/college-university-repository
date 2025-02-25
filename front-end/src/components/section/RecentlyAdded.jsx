@@ -1,5 +1,5 @@
 // components/sections/RecentlyAdded.jsx
-import  { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Clock, 
@@ -11,105 +11,10 @@ import {
   Eye
 } from 'lucide-react';
 import { Button } from '../ui/button';
-
-// Loading Skeleton Component
-const RecentlyAddedSkeleton = () => (
-  <div className="bg-white p-6 rounded-lg shadow-sm">
-    {/* Header Skeleton */}
-    <div className="flex justify-between items-center mb-6">
-      <div className="flex items-center gap-2">
-        <div className="h-5 w-5 bg-gray-200 rounded animate-pulse" />
-        <div className="h-7 w-48 bg-gray-200 rounded animate-pulse" />
-      </div>
-      <div className="h-9 w-24 bg-gray-200 rounded animate-pulse" />
-    </div>
-
-    {/* Items Skeleton */}
-    <div className="space-y-6">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="border-b border-gray-100 pb-6">
-          <div className="h-6 w-3/4 bg-gray-200 rounded animate-pulse mb-3" />
-          <div className="flex flex-wrap gap-4">
-            <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
-            <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
-            <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
+import { useRecentlyAdded } from '../../hooks/useRecentlyAdded';
 
 export default function RecentlyAdded() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [recentItems, setRecentItems] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchRecentItems = async () => {
-      try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        setRecentItems([
-          {
-            id: 1,
-            title: 'Advanced Machine Learning Techniques in Healthcare',
-            author: 'John Doe',
-            department: 'College of Computing',
-            date: '2024-02-20',
-            views: 156,
-            downloads: 42,
-            type: 'Research Paper'
-          },
-          {
-            id: 2,
-            title: 'Sustainable Energy Systems: A Comprehensive Review',
-            author: 'Jane Smith',
-            department: 'College of Engineering',
-            date: '2024-02-19',
-            views: 123,
-            downloads: 35,
-            type: 'Thesis'
-          },
-          {
-            id: 3,
-            title: 'Digital Transformation in Modern Business',
-            author: 'Mike Johnson',
-            department: 'College of Business',
-            date: '2024-02-18',
-            views: 98,
-            downloads: 27,
-            type: 'Conference Paper'
-          },         {
-            id: 3,
-            title: 'Digital Transformation in Modern Business',
-            author: 'Mike Johnson',
-            department: 'College of Business',
-            date: '2024-02-18',
-            views: 98,
-            downloads: 27,
-            type: 'Conference Paper'
-          },         {
-            id: 3,
-            title: 'Digital Transformation in Modern Business',
-            author: 'Mike Johnson',
-            department: 'College of Business',
-            date: '2024-02-18',
-            views: 98,
-            downloads: 27,
-            type: 'Conference Paper'
-          }
-        ]);
-        setIsLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setIsLoading(false);
-      }
-    };
-
-    fetchRecentItems();
-  }, []);
+  const { isLoading, recentItems, error, RecentlyAddedSkeleton } = useRecentlyAdded();
 
   if (isLoading) {
     return <RecentlyAddedSkeleton />;

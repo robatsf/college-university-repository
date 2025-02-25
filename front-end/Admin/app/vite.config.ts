@@ -29,6 +29,7 @@ const alias = [
     find: "ra-data-fakerest",
     replacement: path.resolve(__dirname, "./node_modules/ra-data-fakerest/src"),
   },
+  
   // add any other react-admin packages you have
 ];
 

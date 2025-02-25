@@ -48,14 +48,14 @@ export const useLogin = () => {
         }
       });
 
-      if (response?.access_token) {
-          localStorage.setItem('access_token', response?.access_token);
+      if (response?.data.tokens.access_token) {
+          localStorage.setItem('access_token', response?.data.tokens.access_token);
         }
-        if (response?.refresh_token) {
-          localStorage.setItem('refresh_token', response?.refresh_token);
+        if (response?.data.tokens.access_token) {
+          localStorage.setItem('refresh_token', response?.data.tokens.access_token);
         }
-
-        navigate('/login');
+        localStorage.setItem("user_type", response?.data.user_type)
+        navigate('/');
     } catch (error) {
       // Error is already handled by the API handler
       console.error('Registration error:', error);

@@ -85,7 +85,7 @@ export default function Browse() {
       </ul>
 
       {/* Quick Stats */}
-      <div className="mt-6 pt-6 border-t border-gray-100">
+      {/* <div className="mt-6 pt-6 border-t border-gray-100">
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="p-3 rounded-lg bg-[#0066CC]/5">
             <div className="text-sm font-medium text-gray-900">Total Items</div>
@@ -96,7 +96,7 @@ export default function Browse() {
             <div className="text-2xl font-semibold text-[#0066CC]">142</div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Help Text */}
       <div className="mt-6 text-xs text-gray-500 text-center">
@@ -112,53 +112,3 @@ export default function Browse() {
   );
 }
 
-
-// // With loading state
-// export default function Browse() {
-//     const [isLoading, setIsLoading] = React.useState(false);
-    
-//     if (isLoading) {
-//       return (
-//         <div className="bg-white p-6 rounded-lg shadow-sm animate-pulse">
-//           <div className="h-6 w-24 bg-gray-200 rounded mb-6"></div>
-//           <div className="space-y-4">
-//             {[1, 2, 3, 4, 5].map((i) => (
-//               <div key={i} className="flex items-center gap-3">
-//                 <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
-//                 <div>
-//                   <div className="h-4 w-32 bg-gray-200 rounded"></div>
-//                   <div className="h-3 w-48 bg-gray-200 rounded mt-2"></div>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       );
-//     }
-  
-//     // ... rest of the component
-//   }
-
-// With error handling
-// export default function Browse() {
-//     const [error, setError] = React.useState(null);
-  
-//     if (error) {
-//       return (
-//         <div className="bg-white p-6 rounded-lg shadow-sm">
-//           <div className="text-center text-red-600">
-//             <h2 className="text-xl font-semibold mb-2">Unable to load browse options</h2>
-//             <p className="text-sm text-gray-600">{error.message}</p>
-//             <button 
-//               onClick={() => setError(null)}
-//               className="mt-4 text-[#0066CC] hover:underline"
-//             >
-//               Try again
-//             </button>
-//           </div>
-//         </div>
-//       );
-//     }
-  
-//     // ... rest of the component
-//   }

@@ -4,7 +4,6 @@ from ..serializer.guest_serializer import  GuestRegistrationSerializer
 from ..Reuse.ResponseStructure import  ResponseStructure
 
 
-
 class GuestRegistrationView(generics.CreateAPIView):
     queryset = Guest.objects.all()
     serializer_class = GuestRegistrationSerializer

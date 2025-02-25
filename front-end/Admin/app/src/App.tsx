@@ -3,7 +3,7 @@ import { Admin, Layout, LayoutProps, AppBar as RaAppBar, AppBarProps } from 'rea
 import { Box, Typography } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {roleResources,CustomLayout} from './layout/CustomLayout';
-import { dataProvider } from './dataProvider';
+import  customDataProvider  from './dataProvider';
 import LibrarianDashboard from './libriance/LibrarianDashboard';
 import DepartmentDashboard from './departemnt_head/DepartmentDashboard';
 
@@ -68,7 +68,7 @@ const App = () => {
     <Admin
       title="HUDC IR SYSTEM"
       layout={CustomLayout}
-      dataProvider={dataProvider}
+      dataProvider={customDataProvider}
       darkTheme={null}
       dashboard={role === "departmentHead" ? DepartmentDashboard : LibrarianDashboard}
     >

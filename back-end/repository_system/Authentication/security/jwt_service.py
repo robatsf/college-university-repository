@@ -105,8 +105,8 @@ class JWTService:
         payload_data = {
             "user_id": str(user.id),
             "email": user.institutional_email if hasattr(user, "institutional_email") else user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
+            "first_name":  user.first_name if not user.username else user.username ,
+            "last_name": user.last_name if not user.username else None ,
             "user_type": user_type,
             "exp": datetime.utcnow() + timedelta(minutes=60),
             "iat": datetime.utcnow(),

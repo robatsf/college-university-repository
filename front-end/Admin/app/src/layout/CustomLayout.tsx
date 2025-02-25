@@ -9,16 +9,9 @@ import {
   Lock
 } from "lucide-react";
 import { CustomTopBar } from '../components/CustomTopBar';
-import { 
-  FileList, 
-  FileCreate, 
-  FileEdit,
-} from "../libriance/librianiesFiles";
-import { 
-  DepartmentFileList, 
-  DepartmentFileCreate ,
-  DepartmentFileEdit
-} from "../departemnt_head/DepartmentFiles";
+import  DepartmentFileCreate  from "../departemnt_head/components/DepartmentFileCreate";
+import DepartmentFileEdit from "../departemnt_head/components/DepartmentFileEdit";
+import DepartmentFileList from "../departemnt_head/components/DepartmentFileList";
 import { 
   ApprovalList, 
   ApprovalShow 
@@ -31,15 +24,21 @@ import { ThemeProvider,createTheme } from '@mui/material/styles';
 import { Layout, LayoutProps  } from 'react-admin';
 import {UpdateLibriancePassword} from '../libriance/Updatepassword'
 import {UpdateDepartemntPassword} from '../departemnt_head/Updatepassword'
+import DepartmentFileShow from "../departemnt_head/components/DepartmentFileShow";
+import { LibrarianList } from "../libriance/components/LibrarianList";
+import { LibrarianCreate } from "../libriance/components/LibrarianCreate";
+import { LibrarianEdit } from "../libriance/components/LibrarianEdit";
+import librarianFileShow from "../libriance/components/Librarianshow";
 
 const roleResources = {
   librarian: [
     <Resource
       key="files"
-      name="files"
-      list={FileList}
-      create={FileCreate}
-      edit={FileEdit}
+      name="libapprovals"
+      list={LibrarianList}
+      create={LibrarianCreate}
+      edit={LibrarianEdit}
+      show={librarianFileShow}
       icon={FileText}
       options={{ 
         label: 'Library Files',
@@ -77,10 +76,11 @@ const roleResources = {
     // />,
     <Resource
       key="deptfiles"
-      name="deptfiles"
+      name="department_files"
       list={DepartmentFileList}
       edit={DepartmentFileEdit}
       create={DepartmentFileCreate}
+      show={DepartmentFileShow}
       icon={FolderPlus}
       options={{ 
         label: 'Department Files',

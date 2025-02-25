@@ -10,9 +10,10 @@ import Profile from './pages/ProfilePage';
 import MainPage from './pages/MainPage';
 import NotFound from './pages/NotFound';
 import Browserdetails from './pages/BrowseDetail';
-import FilePage from './pages/ViewFilepage';
+import FileViewerPage from './pages/ViewFilepage'
 import TermsAndPrivacyPolicy from './pages/TermsAndPrivacyPolicy';
 import TeacherDashboard from './pages/teacherDasbord';
+
 
 // Auth guard component
 const PrivateRoute = ({ children }) => {
@@ -31,7 +32,6 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} /> {/* Fixed route name */}
         <Route path="/browsedetail/:id" element={<Browserdetails />} /> {/* Improved route naming */}
-        <Route path="/filepage" element={<FilePage />} />
         <Route path="/TermsAndPrivacyPolicy" element={<TermsAndPrivacyPolicy />} />
 
         {/* Protected Routes */}
@@ -46,6 +46,15 @@ const AppRoutes = () => {
          <Route path="/TeacherDashboard"
           element={ <TeacherDashboard/> }
            />
+
+        <Route
+          path="/fileViwe/:id"
+          element={
+            // <PrivateRoute>
+              <FileViewerPage />
+           // </PrivateRoute>
+          }
+        />
 
         {/* 404 Route */}
         <Route path="*" element={<NotFound />} />

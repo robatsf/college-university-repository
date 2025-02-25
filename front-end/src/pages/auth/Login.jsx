@@ -17,21 +17,21 @@ export default function Login() {
   const watchEmail = form.watch('email');
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       {/* Home Button */}
       <Link
         to="/"
-        className="absolute top-4 left-4 p-2 rounded-full bg-white dark:bg-gray-800 
+        className="absolute top-4 left-4 p-2 rounded-full bg-white 
                    shadow-lg hover:shadow-xl transition-all duration-200 
                    group hover:scale-105 z-50"
       >
         <Home className="h-5 w-5 text-[#0066CC] group-hover:text-[#0052A3]" />
       </Link>
 
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+      <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-[#0066CC]">Welcome Back</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-600 mt-1">
             Please sign in to continue
           </p>
         </div>
@@ -44,7 +44,7 @@ export default function Login() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm text-gray-700 dark:text-gray-300">
+                  <FormLabel className="text-sm text-gray-700">
                     Email Address
                   </FormLabel>
                   <FormControl>
@@ -58,8 +58,8 @@ export default function Login() {
                             ? 'border-red-500 focus:border-red-500'
                             : field.value && !form.formState.errors.email
                             ? 'border-green-500 focus:border-green-500'
-                            : 'border-gray-200 dark:border-gray-700'}
-                          focus:ring-[#0066CC]/20 dark:bg-gray-800 dark:text-white`}
+                            : 'border-gray-200'}
+                          focus:ring-[#0066CC]/20`}
                       />
                       {watchEmail && (
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -84,7 +84,7 @@ export default function Login() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex justify-between items-center">
-                    <FormLabel className="text-sm text-gray-700 dark:text-gray-300">
+                    <FormLabel className="text-sm text-gray-700">
                       Password
                     </FormLabel>
                     <Link
@@ -107,8 +107,8 @@ export default function Login() {
                             ? 'border-red-500 focus:border-red-500'
                             : field.value && !form.formState.errors.password
                             ? 'border-green-500 focus:border-green-500'
-                            : 'border-gray-200 dark:border-gray-700'}
-                          focus:ring-[#0066CC]/20 dark:bg-gray-800 dark:text-white`}
+                            : 'border-gray-200'}
+                          focus:ring-[#0066CC]/20`}
                       />
                       <button
                         type="button"
@@ -148,7 +148,7 @@ export default function Login() {
                   'Sign In'
                 )}
               </Button>
-              <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-center text-sm text-gray-600">
                 Don't have an account?{' '}
                 <Link
                   to="/register"
