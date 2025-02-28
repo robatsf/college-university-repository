@@ -107,10 +107,9 @@ class TeacherAdmin(admin.ModelAdmin, ProfileImagePreviewMixin, StatusIndicatorMi
 
     def save_model(self, request, obj, form, change):
         """Generate institutional email and password for new teachers."""
-        is_new = not change  # Check if it's a new entry
+        is_new = not change 
 
         if is_new:
-            # Fetch existing department without creating a new one
             if obj.department and not obj.department_id:
                 department = DepartmentList.objects.filter(name=obj.department).first()
                 if department:
@@ -118,7 +117,7 @@ class TeacherAdmin(admin.ModelAdmin, ProfileImagePreviewMixin, StatusIndicatorMi
                 else:
                     self.message_user(request, f"Department '{obj.department}' does not exist.", messages.ERROR)
                     return
-
+                
             obj.institutional_email = UserUtils.generate_institutional_email(
                 obj.first_name, obj.last_name, "teacher"
             )

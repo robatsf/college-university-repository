@@ -9,7 +9,7 @@ class JWTAuthentication(BaseAuthentication):
     def authenticate(self, request: Request):
         auth = request.headers.get('Authorization', None)
         if not auth:
-            return None  # No authorization header, let IsAuthenticated handle this
+            return None 
 
         parts = auth.split()
 

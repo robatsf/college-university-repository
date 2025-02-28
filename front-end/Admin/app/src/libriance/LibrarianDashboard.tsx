@@ -1,158 +1,211 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Grid, Card, CardContent, CardHeader } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { useGetList } from "react-admin";
+import { Box, Typography, Grid, Card, CardContent, CardHeader, styled } from "@mui/material";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, 
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from "recharts";
+import { FileText, Download, Upload, Building } from "lucide-react";
+import { apibase } from "../dataProvider";
 import StatCard from "../components/StatCard";
 import WelcomeCard from "../components/WelcomeCard";
-import { FileText, Download, Upload } from "lucide-react";
+import { tokenManager } from "../utils/tokenManager";
 
-// Styled components used for the Weekly Activity section
-const StyledCard = styled(Card)(({ theme }) => ({
-  height: "100%",
-  display: "flex",
-  flexDirection: "column",
-  transition: "transform 0.2s",
-  "&:hover": {
-    transform: "translateY(-4px)",
+// Types
+interface Department {
+  id: string;
+  name: string;
+  file_count: number;
+  download_total: number;
+  history_total: number;
+  unapproved_files: number;
+  created_at: string;
+  updated_time: string;
+}
+
+interface DepartmentStats {
+  total_departments: number;
+  total_files: number;
+  total_downloads: number;
+  total_history: number;
+  total_unapproved: number;
+}
+
+interface ApiResponse {
+  status: string;
+  message: string;
+  data: {
+    departments: Department[];
+    statistics: DepartmentStats;
+  };
+}
+
+// Styled Components
+export const StyledCard = styled(Card)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    boxShadow: theme.shadows[4],
   },
+  borderRadius: theme.shape.borderRadius,
+  overflow: 'hidden',
 }));
 
-const StyledCardHeader = styled(CardHeader)(({ theme }) => ({
-  background: theme.palette.grey[50],
+export const StyledCardHeader = styled(CardHeader)(({ theme }) => ({
+  background: theme.palette.mode === 'light' 
+    ? theme.palette.grey[50] 
+    : theme.palette.grey[900],
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  '& .MuiCardHeader-title': {
+    fontSize: '1.125rem',
+    fontWeight: 600,
+    color: theme.palette.text.primary,
+  },
+  '& .MuiCardHeader-subheader': {
+    fontSize: '0.875rem',
+    color: theme.palette.text.secondary,
+  },
+  padding: theme.spacing(2),
 }));
+
+// Constants
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 const LibrarianDashboard = () => {
   const role = "librarian";
   const name = localStorage.getItem("name") || "Librarian";
 
-  // Define state for various statistics
-  const [stats, setStats] = useState({
-    totalUploads: 0,
-    totalDownloads: 0,
-    pendingApprovals: 0,
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [stats, setStats] = useState<DepartmentStats>({
+    total_departments: 0,
+    total_files: 0,
+    total_downloads: 0,
+    total_history: 0,
+    total_unapproved: 0,
   });
 
-  // State to control history section height
-  const [historyExpanded, setHistoryExpanded] = useState(false);
-
-  // Fetch data using react-admin's useGetList hook
-  const { data: uploads } = useGetList("uploads", {
-    pagination: { page: 1, perPage: 1 },
-    sort: { field: "id", order: "DESC" },
-  });
-
-  const { data: downloads } = useGetList("downloads", {
-    pagination: { page: 1, perPage: 1 },
-    sort: { field: "id", order: "DESC" },
-  });
-
-  // Update statistics when uploads or downloads data changes
   useEffect(() => {
-    setStats({
-      totalUploads: uploads?.total || Math.floor(Math.random() * 100),
-      totalDownloads: downloads?.total || Math.floor(Math.random() * 500),
-      pendingApprovals: Math.floor(Math.random() * 20),
-    });
-  }, [uploads, downloads]);
+    const fetchDepartments = async () => {
+      try {
+        const token = await tokenManager.getAuthHeaders();
+        if (!token) throw new Error('No token found');
 
-  // Data for the weekly activity chart
-  const activityData = [
-    { name: "Mon", uploads: 4, downloads: 12 },
-    { name: "Tue", uploads: 3, downloads: 15 },
-    { name: "Wed", uploads: 5, downloads: 20 },
-    { name: "Thu", uploads: 2, downloads: 18 },
-    { name: "Fri", uploads: 3, downloads: 25 },
-    { name: "Sat", uploads: 6, downloads: 10 },
-    { name: "Sun", uploads: 4, downloads: 8 },
-  ];
 
-  // Sample history data for the History section
-  const historyData = [
-    { id: 1, title: "Uploaded Document A", date: "Mon 9:00 AM" },
-    { id: 2, title: "Downloaded Document B", date: "Tue 10:15 AM" },
-    { id: 3, title: "Approval Request for Document C", date: "Wed 11:30 AM" },
-    { id: 4, title: "Updated Document D", date: "Thu 1:00 PM" },
-    { id: 5, title: "Approved Document E", date: "Fri 2:45 PM" },
-    { id: 6, title: "Uploaded Document F", date: "Sat 3:00 PM" },
-    { id: 7, title: "Downloaded Document G", date: "Sun 4:30 PM" },
-  ];
+        const response = await fetch(`${apibase}/departments/?all=true`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': '*/*',
+          }
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch departments');
+        
+        const result: ApiResponse = await response.json();
+        
+        if (result.status === 'success') {
+          setDepartments(result.data.departments);
+          setStats(result.data.statistics);
+        }
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
+
+  const chartData = departments.map(dept => ({
+    name: dept.name,
+    uploads: dept.file_count,
+    downloads: dept.download_total,
+    value: dept.history_total,
+  }));
 
   return (
     <Box p={3}>
-      {/* Welcome message */}
       <WelcomeCard role={role} name={name} />
 
-      <Grid container spacing={3}>
-        {/* Librarian-specific statistics */}
+      <Grid container spacing={4}>
+        {/* Statistics Cards */}
         <Grid item xs={12} md={4}>
-          <StatCard title="Total Uploads" value={stats.totalUploads} icon={Upload} trend={12} />
+          <StatCard 
+            title="Total Departments" 
+            value={stats.total_departments} 
+            icon={Building} 
+            trend={0} 
+          />
         </Grid>
         <Grid item xs={12} md={4}>
-          <StatCard title="Total Downloads" value={stats.totalDownloads} icon={Download} trend={8} />
+          <StatCard 
+            title="Total Files" 
+            value={stats.total_files} 
+            icon={Upload} 
+            trend={12} 
+          />
         </Grid>
         <Grid item xs={12} md={4}>
+          <StatCard 
+            title="Total Downloads" 
+            value={stats.total_downloads} 
+            icon={Download} 
+            trend={8} 
+          />
+        </Grid>
+        {/* <Grid item xs={12} md={3}>
           <StatCard
             title="Pending Approvals"
-            value={stats.pendingApprovals}
+            value={stats.total_unapproved}
             icon={FileText}
             trend={-2}
           />
-        </Grid>
+        </Grid> */}
 
-        {/* Weekly Activity Chart and History Section */}
+        {/* Charts */}
         <Grid item xs={12}>
           <StyledCard>
-            <StyledCardHeader title="Weekly Activity" />
+            <StyledCardHeader title="Department Statistics" />
             <CardContent>
               <Box display="flex" gap={2}>
-                {/* Chart Container */}
-                <Box flex={2} height={300}>
+                <Box flex={2} height={400}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={activityData}>
+                    <BarChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
                       <Tooltip />
-                      <Bar dataKey="uploads" fill="#1976d2" name="Uploads" />
+                      <Bar dataKey="uploads" fill="#1976d2" name="Files" />
                       <Bar dataKey="downloads" fill="#dc004e" name="Downloads" />
                     </BarChart>
                   </ResponsiveContainer>
                 </Box>
-                {/* History Section */}
-                <Box flex={1} display="flex" flexDirection="column">
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6">History</Typography>
-                    <Typography
-                      variant="body2"
-                      color="primary"
-                      sx={{ cursor: "pointer" }}
-                      onClick={() => setHistoryExpanded(!historyExpanded)}
-                    >
-                      {historyExpanded ? "View Less" : "View All"}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ mt: 1, height: historyExpanded ? 600 : 300, overflowY: "auto" }}>
-                    {historyData.map((item) => (
-                      <Box
-                        key={item.id}
-                        sx={{ mb: 1, p: 1, border: "1px solid #ddd", borderRadius: 1 }}
+                
+                <Box flex={1} height={400}>
+                  <Typography variant="h6" gutterBottom>
+                    Department Activity Distribution
+                  </Typography>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        label
                       >
-                        <Typography variant="subtitle2">{item.title}</Typography>
-                        <Typography variant="caption" color="textSecondary">
-                          {item.date}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
+                        {chartData.map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={COLORS[index % COLORS.length]} 
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </Box>
               </Box>
             </CardContent>
