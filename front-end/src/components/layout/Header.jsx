@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Menu as MenuIcon, X, LogOut, Key } from 'lucide-react';
+import { BookOpen, Menu as MenuIcon, X, LogOut, Key, Mail } from 'lucide-react';
 import { Button } from '../ui/button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -9,6 +9,7 @@ import Avatar from '@mui/material/Avatar';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { getTokenData, removeToken } from '../../hooks/auth/token';
+import BackendUrl from '../../hooks/config';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,7 +36,7 @@ export default function Header() {
     handleMenuClose();
   };
 
-  const navItems = !user ? [{ name: 'SignIn', path: '/login' }] : [];
+  const navItems = !user ? [{ name: 'Sign In', path: '/login' }] : [];
 
   const renderUserAvatar = () => {
     if (!user) return null;
@@ -45,21 +46,27 @@ export default function Header() {
       if (user.user_type === 'guest') {
         return (
           <>
-            <IconButton
-              onClick={handleMenuOpen}
-              sx={{
-                width: 35,
-                height: 35,
-                bgcolor: '#0066CC',
-                color: 'white',
-                '&:hover': {
-                  bgcolor: '#0052A3',
-                },
-                border: '2px solid white',
-              }}
-            >
-              {user.first_name?.[0]?.toUpperCase() || 'G'}
-            </IconButton>
+            <div className="flex items-center">
+              <div className="mr-3 flex flex-col items-end">
+                <span className="text-sm font-medium">{user.user_name || 'Guest'}</span>
+                <span className="text-xs text-gray-200">{user.email}</span>
+              </div>
+              <IconButton
+                onClick={handleMenuOpen}
+                sx={{
+                  width: 35,
+                  height: 35,
+                  bgcolor: '#0066CC',
+                  color: 'white',
+                  '&:hover': {
+                    bgcolor: '#0052A3',
+                  },
+                  border: '2px solid white',
+                }}
+              >
+                {user.user_name?.[0]?.toUpperCase() || 'G'}
+              </IconButton>
+            </div>
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
@@ -79,6 +86,12 @@ export default function Header() {
               transformOrigin={{ horizontal: 'right', vertical: 'top' }}
               anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
+              <MenuItem disabled>
+                <ListItemIcon>
+                  <Mail className="h-4 w-4" />
+                </ListItemIcon>
+                <ListItemText>{user.email}</ListItemText>
+              </MenuItem>
               <MenuItem component={Link} to="/change-password" onClick={handleMenuClose}>
                 <ListItemIcon>
                   <Key className="h-4 w-4" />
@@ -100,12 +113,16 @@ export default function Header() {
       if (['teacher', 'student'].includes(user.user_type)) {
         return (
           <div className="flex items-center">
-            <span className="mr-2 text-sm">{user.first_name}</span>
-            <Link to="/profile">
+            <div className="mr-3 flex flex-col items-end">
+              <span className="text-sm font-medium">{user.user_name}</span>
+              <span className="text-xs text-gray-200">{user.email}</span>
+            </div>
               <Avatar
-                src={user.avatar || undefined}
-                alt="Profile"
+                src={`${BackendUrl.imageUrl}/${user.image_path}`}
+                alt={`Profile/${user.user_type}`}
+                onClick={() => navigate(`/Profile/${user.user_type}`)}
                 sx={{
+                  float:'right',
                   width: 35,
                   height: 35,
                   border: '2px solid white',
@@ -117,9 +134,8 @@ export default function Header() {
                   fontSize: '1rem',
                 }}
               >
-                {user.first_name?.[0]?.toUpperCase() || 'U'}
+                {user.user_name?.[0]?.toUpperCase() || 'U'}
               </Avatar>
-            </Link>
           </div>
         );
       }
@@ -128,11 +144,14 @@ export default function Header() {
       if (['department_head', 'librarian'].includes(user.user_type)) {
         return (
           <div className="flex items-center">
-            <span className="mr-2 text-sm">{user.first_name}</span>
-            <Link to="/dashboard">
+            <div className="mr-3 flex flex-col items-end">
+              <span className="text-sm font-medium">{user.user_name}</span>
+              <span className="text-xs text-gray-200">{user.email}</span>
+            </div>
               <Avatar
-                src={user.avatar || undefined}
+                src={`${BackendUrl.imageUrl}/${user.image_path}`}
                 alt="Profile"
+                onClick={() => navigate('/dashboard')}
                 sx={{
                   width: 35,
                   height: 35,
@@ -145,9 +164,8 @@ export default function Header() {
                   fontSize: '1rem',
                 }}
               >
-                {user.first_name?.[0]?.toUpperCase() || 'U'}
+                {user.user_name?.[0]?.toUpperCase() || 'U'}
               </Avatar>
-            </Link>
           </div>
         );
       }

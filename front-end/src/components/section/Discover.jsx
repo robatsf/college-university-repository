@@ -76,10 +76,10 @@ export default function Discover() {
           <LoadingKeywords />
         ) : (
           <div className="flex flex-wrap gap-2">
-            {popularSearches.map((keyword) => (
+            {popularSearches.map((keyword,index) => (
               <Link
-                key={keyword.query}
-                to={`/search?q=${encodeURIComponent(keyword.query)}`}
+                key={keyword.query + index}
+                to={`browsedetail/search?q=${encodeURIComponent(keyword.query)}`}
                 className="group"
               >
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full 
@@ -111,7 +111,7 @@ export default function Discover() {
             {trendingTopics.map((topic) => (
               <Link
                 key={topic.query}
-                to={`/search?q=${encodeURIComponent(topic.query)}`}
+                to={`browsedetail/search?q=${encodeURIComponent(topic.query)}`}
                 className="group block"
               >
                 <div className="p-3 rounded-lg hover:bg-[#0066CC]/5 

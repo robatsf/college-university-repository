@@ -11,6 +11,7 @@ from ..models import FileSystem, PermissionSetting, ApprovalStatus
 from ..serializer.FileSystemSerializer import FileSystemSerializer
 from ..permissions import DynamicPermission
 from ..serializer.DepartmentService import DepartmentService
+from .historyViweSet import create_history
 
 class FileSystemViewSet(viewsets.ModelViewSet):
     """
@@ -37,7 +38,7 @@ class FileSystemViewSet(viewsets.ModelViewSet):
 
         filter_kwargs = {}
         for param, value in query_params.items():
-            if value is '' :
+            if value == '' :
                 value = None
             if param in allowed_filters:
                 filter_kwargs[param] = value
@@ -71,7 +72,6 @@ class FileSystemViewSet(viewsets.ModelViewSet):
             file_size = file.size
             file_extension = os.path.splitext(file.name)[1]
 
-            # Define the folder path and create it if necessary
             file_folder = os.path.join(settings.MEDIA_ROOT, 'files')
             if not os.path.exists(file_folder):
                 os.makedirs(file_folder)
@@ -90,6 +90,7 @@ class FileSystemViewSet(viewsets.ModelViewSet):
                 file_extension=file_extension,
                 original_file_path="files"+file_path,
             )
+            create_history(self.request.user.id,"Added a file : " + self.request.POST.get('title') or "One file")
         except ValidationError as e:
             raise e
         except Exception as e:
@@ -130,10 +131,10 @@ class FileSystemViewSet(viewsets.ModelViewSet):
                 disapproval_reason=None
             )
         else:
-            # If no new file is provided, just save the other updates
             serializer.save(
                 disapproval_reason=None
             )
+            create_history(self.request.user.id,"updated a file : " + self.request.POST.get('title') or "one file")
 
     def perform_destroy(self, instance):
         """
@@ -141,7 +142,8 @@ class FileSystemViewSet(viewsets.ModelViewSet):
         """
         if self.request.user.role != 'admin' and instance.uploaded_by_id != self.request.user.id:
             raise PermissionDenied("You do not have permission to delete this file.")
-
+        
+        create_history(self.request.user.id,"Deleted a file : One file")
         DepartmentService.update_department(self.request.department_id, file_count=-1)
         instance.delete()
     

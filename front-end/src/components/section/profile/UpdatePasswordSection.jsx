@@ -1,36 +1,25 @@
-import { Lock, Eye, EyeOff } from 'lucide-react';
-import { useEffect,useState } from 'react';
+// components/UpdatePasswordSection.jsx
+import { Lock, Eye, EyeOff, Check, X } from 'lucide-react';
+import { usePasswordUpdate } from '../../../hooks/usePasswordUpdate';
+
 const UpdatePasswordSection = () => {
-  const [showPassword, setShowPassword] = useState({
-    current: false,
-    new: false,
-    confirm: false
-  });
-  const [formData, setFormData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
+  const {
+    register,
+    onSubmit,
+    errors,
+    isLoading,
+    showPassword,
+    togglePasswordVisibility,
+    isMatching,
+    watch,
+    getPasswordRequirements,
+    isNewPasswordFocused,
+    handleNewPasswordFocus,
+    handleNewPasswordBlur,
+  } = usePasswordUpdate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Add your password update logic here
-    console.log('Password update submitted:', formData);
-  };
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const togglePasswordVisibility = (field) => {
-    setShowPassword({
-      ...showPassword,
-      [field]: !showPassword[field]
-    });
-  };
+  const newPassword = watch('newPassword');
+  const requirements = getPasswordRequirements(newPassword);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
@@ -39,8 +28,8 @@ const UpdatePasswordSection = () => {
         <h3 className="font-semibold text-xl">Update Password</h3>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Current Password */}
+      <form onSubmit={onSubmit} className="space-y-4">
+        {/* Current Password Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Current Password
@@ -48,9 +37,7 @@ const UpdatePasswordSection = () => {
           <div className="relative">
             <input
               type={showPassword.current ? "text" : "password"}
-              name="currentPassword"
-              value={formData.currentPassword}
-              onChange={handleChange}
+              {...register('currentPassword')}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               placeholder="Enter current password"
             />
@@ -66,9 +53,12 @@ const UpdatePasswordSection = () => {
               )}
             </button>
           </div>
+          {errors.currentPassword && (
+            <p className="mt-1 text-sm text-red-600">{errors.currentPassword.message}</p>
+          )}
         </div>
 
-        {/* New Password */}
+        {/* New Password Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             New Password
@@ -76,11 +66,11 @@ const UpdatePasswordSection = () => {
           <div className="relative">
             <input
               type={showPassword.new ? "text" : "password"}
-              name="newPassword"
-              value={formData.newPassword}
-              onChange={handleChange}
+              {...register('newPassword')}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               placeholder="Enter new password"
+              onFocus={handleNewPasswordFocus}
+              onBlur={handleNewPasswordBlur}
             />
             <button
               type="button"
@@ -94,19 +84,42 @@ const UpdatePasswordSection = () => {
               )}
             </button>
           </div>
+          
+          {/* Password Requirements */}
+          <div
+            className={`mt-2 space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${
+              isNewPasswordFocused ? 'max-h-[200px] opacity-100' : 'max-h-0 opacity-0'
+            }`}
+          >
+            {requirements.map((req) => (
+              <div 
+                key={req.id} 
+                className={`flex items-center gap-1 text-sm transition-all duration-300 ${
+                  isNewPasswordFocused ? 'translate-y-0' : 'translate-y-2'
+                }`}
+              >
+                {req.met ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <X className="h-4 w-4 text-red-500" />
+                )}
+                <span className={req.met ? 'text-green-700' : 'text-red-600'}>
+                  {req.message}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Confirm Password */}
+        {/* Confirm Password Field */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Confirm New Password
+            Confirm Password
           </label>
           <div className="relative">
             <input
               type={showPassword.confirm ? "text" : "password"}
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
+              {...register('confirmPassword')}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               placeholder="Confirm new password"
             />
@@ -122,13 +135,24 @@ const UpdatePasswordSection = () => {
               )}
             </button>
           </div>
+          {errors.confirmPassword && (
+            <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+          )}
         </div>
 
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 rounded-lg hover:opacity-90 transition-opacity"
+          disabled={isLoading || !isMatching}
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 rounded-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Update Password
+          {isLoading ? (
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+              Updating...
+            </div>
+          ) : (
+            'Update Password'
+          )}
         </button>
       </form>
     </div>

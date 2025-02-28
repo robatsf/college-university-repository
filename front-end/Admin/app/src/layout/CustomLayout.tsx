@@ -29,9 +29,21 @@ import { LibrarianList } from "../libriance/components/LibrarianList";
 import { LibrarianCreate } from "../libriance/components/LibrarianCreate";
 import { LibrarianEdit } from "../libriance/components/LibrarianEdit";
 import librarianFileShow from "../libriance/components/Librarianshow";
+import { Home } from "lucide-react";
+
+const RedirectResource = () => {
+  window.location = "/"
+};
 
 const roleResources = {
   librarian: [
+    <Resource
+      key="home"
+      name="home"
+      list={RedirectResource} 
+      icon={Home} 
+      options={{ label: "Home" }} 
+    />,
     <Resource
       key="files"
       name="libapprovals"
@@ -55,6 +67,13 @@ const roleResources = {
     />,
   ],
   departmentHead: [
+    <Resource
+      key="home"
+      name="home"
+      list={RedirectResource} 
+      icon={Home} 
+      options={{ label: "Home" }} 
+    />,
     <Resource
       key="approvals"
       name="approvals"

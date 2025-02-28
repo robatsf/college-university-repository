@@ -15,7 +15,6 @@ export const useRecentlyAdded = () => {
         const currentYear = new Date().getFullYear();
         const response = await axios.get(`${BackendUrl.file}/search/?year=${currentYear}&limit=1`);
         
-        // Transform the data to match our component's needs
         const transformedData = response.data.results.map(item => ({
           id: item.id,
           title: item.title,
@@ -27,7 +26,6 @@ export const useRecentlyAdded = () => {
           type: item.file_type || 'Document'
         }));
 
-        // Sort by date (most recent first) and limit to 5 items
         const sortedItems = transformedData.sort((a, b) => 
           new Date(b.date) - new Date(a.date)
         ).slice(0, 5);

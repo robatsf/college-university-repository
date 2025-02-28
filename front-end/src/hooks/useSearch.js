@@ -1,14 +1,30 @@
-// hooks/useSearch.js
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import BackendUrl from './config'
+import BackendUrl from './config';
 
 export function useSearch() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [popularSearches, setPopularSearches] = useState([]); 
+  const [popularSearches, setPopularSearches] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [activeFilter, setActiveFilter] = useState(null);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  // Parse search query to extract filter and search term
+  const parseSearchQuery = (query) => {
+    const filterMatch = query.match(/^@(\w+)\s*(.*)/);
+    if (filterMatch) {
+      return {
+        filter: filterMatch[1],
+        searchTerm: filterMatch[2].trim()
+      };
+    }
+    return {
+      filter: null,
+      searchTerm: query.trim()
+    };
+  };
 
   useEffect(() => {
     const fetchPopularSearches = async () => {
@@ -27,16 +43,30 @@ export function useSearch() {
     fetchPopularSearches();
   }, []);
 
-  // Handle search query changes
   useEffect(() => {
     const debounceTimer = setTimeout(async () => {
       if (searchQuery.length > 0) {
         setIsLoading(true);
         setError(null);
-        
+
         try {
-          const response = await axios.get(`${BackendUrl.file}/search/search/?q=${encodeURIComponent(searchQuery)}`);
+          const { filter, searchTerm } = parseSearchQuery(searchQuery);
+          let endpoint = `${BackendUrl.file}/search/search/?`;
+          
+          const params = new URLSearchParams();
+          
+          if (filter) {
+            params.append(filter, searchTerm);
+          } else {
+            params.append('q', searchQuery);
+          }
+
+          const response = await axios.get(`${endpoint}${params.toString()}`);
           setSearchResults(response.data.results.results || []);
+          
+          // Update active filter
+          setActiveFilter(filter);
+          
         } catch (err) {
           setError('Error performing search');
           setSearchResults([]);
@@ -45,11 +75,22 @@ export function useSearch() {
         }
       } else {
         setSearchResults([]);
+        setActiveFilter(null);
       }
     }, 300);
 
     return () => clearTimeout(debounceTimer);
   }, [searchQuery]);
+
+  const handleFilterSearch = (filterType) => {
+    setSearchQuery(`@${filterType} `);
+  };
+
+  const clearFilter = () => {
+    const searchTerm = searchQuery.replace(/^@\w+\s*/, '');
+    setSearchQuery(searchTerm);
+    setActiveFilter(null);
+  };
 
   return {
     searchQuery,
@@ -57,6 +98,10 @@ export function useSearch() {
     searchResults,
     popularSearches,
     isLoading,
-    error
+    error,
+    activeFilter,
+    handleFilterSearch,
+    clearFilter,
+    setIsSearchFocused 
   };
 }

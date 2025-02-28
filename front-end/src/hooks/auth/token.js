@@ -1,4 +1,4 @@
-// src/utils/token.js
+
 export const getTokenData = () => {
     try {
       const token = localStorage.getItem('access_token');
@@ -6,14 +6,14 @@ export const getTokenData = () => {
 
       const payload = token.split('.')[1];
       const decodedPayload = JSON.parse(atob(payload));
-
-    //   department_head and librarian
   
       return {
         user_id: decodedPayload.user_id,
-        email: decodedPayload.email,
-        first_name: decodedPayload.first_name,
-        last_name: decodedPayload.last_name,
+        user_name : decodedPayload.user_name,
+        department : decodedPayload.department,
+        department_id : decodedPayload.department_id,
+        email : decodedPayload.email,
+        image_path : decodedPayload.image_path,
         user_type: decodedPayload.user_type,
       };
     } catch (error) {

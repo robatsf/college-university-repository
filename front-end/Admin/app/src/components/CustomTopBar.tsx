@@ -19,8 +19,7 @@ export const CustomTopBar = ({ role }) => {
   const [sidebarOpen, setSidebarOpen] = useSidebarState();
 
   const handleLogout = () => {
-    localStorage.removeItem('role');
-    localStorage.removeItem('token');
+    localStorage.clear()
     window.location.href = '/login';
   };
 
@@ -49,7 +48,7 @@ export const CustomTopBar = ({ role }) => {
           />
 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            HUDC IR SYSTEM
+          HUDC IRS
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

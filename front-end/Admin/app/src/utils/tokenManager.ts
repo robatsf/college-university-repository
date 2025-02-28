@@ -141,12 +141,11 @@ class TokenManager {
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.data.access_token);
+      localStorage.setItem('access_token', data.data.access_token);
       return data.data.access_token;
     } catch (error) {
       console.error('Token refresh failed:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('refresh_token');
+      localStorage.clear()
       this.showErrorMessage('Session expired. Redirecting to login...');
       this.redirectToLogin();
       return null;
@@ -154,7 +153,7 @@ class TokenManager {
   }
 
   public async getValidToken(): Promise<string | null> {
-     const currentToken = localStorage.getItem('token')
+     const currentToken = localStorage.getItem('access_token')
     
     if (!currentToken) {
       this.showErrorMessage('No access token found. Please login.');

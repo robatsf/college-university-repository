@@ -51,8 +51,8 @@ export const useLogin = () => {
       if (response?.data.tokens.access_token) {
           localStorage.setItem('access_token', response?.data.tokens.access_token);
         }
-        if (response?.data.tokens.access_token) {
-          localStorage.setItem('refresh_token', response?.data.tokens.access_token);
+        if (response?.data.tokens.refresh_token) {
+          localStorage.setItem('refresh_token', response?.data.tokens.refresh_token);
         }
         localStorage.setItem("user_type", response?.data.user_type)
         navigate('/');

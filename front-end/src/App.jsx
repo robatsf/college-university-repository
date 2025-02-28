@@ -6,13 +6,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/forgetPassword';
-import Profile from './pages/ProfilePage';
+import Studentdashboard from './pages/Studentdashboard';
 import MainPage from './pages/MainPage';
 import NotFound from './pages/NotFound';
 import Browserdetails from './pages/BrowseDetail';
 import FileViewerPage from './pages/ViewFilepage'
 import TermsAndPrivacyPolicy from './pages/TermsAndPrivacyPolicy';
 import TeacherDashboard from './pages/teacherDasbord';
+import HelpPage from './pages/help';
 
 
 // Auth guard component
@@ -30,37 +31,42 @@ const AppRoutes = () => {
         <Route path="/" element={<MainPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/forgotpassword" element={<ForgotPassword />} /> {/* Fixed route name */}
-        <Route path="/browsedetail/:id" element={<Browserdetails />} /> {/* Improved route naming */}
+        <Route path="/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/browsedetail/*" element={<Browserdetails />} />
         <Route path="/TermsAndPrivacyPolicy" element={<TermsAndPrivacyPolicy />} />
+        <Route path="/help" element={<HelpPage />} />
+        <Route path='/dashboard' element={<iframe src="/dist/index.html" style={{ width: "100%", height: "100vh", border: "none" }} />} />
+
+
 
         {/* Protected Routes */}
         <Route
-          path="/profile"
+          path="/Profile/student"
           element={
             <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
+              <Studentdashboard />
+           </PrivateRoute>
           }
         />
-         <Route path="/TeacherDashboard"
-          element={ <TeacherDashboard/> }
-           />
+         <Route path="/Profile/teacher"
+          element={ 
+          <PrivateRoute>
+          <TeacherDashboard/> 
+         </PrivateRoute>
+          }/>
 
         <Route
           path="/fileViwe/:id"
           element={
-            // <PrivateRoute>
+           <PrivateRoute>
               <FileViewerPage />
-           // </PrivateRoute>
+           </PrivateRoute>
           }
         />
 
         {/* 404 Route */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-
-      {/* Add ToastContainer for react-toastify */}
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -71,7 +77,7 @@ const AppRoutes = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="colored" // Optional: Use a colored theme
+        theme="colored"
       />
     </BrowserRouter>
   );

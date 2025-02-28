@@ -2,8 +2,6 @@
 import {jwtDecode} from 'jwt-decode';
 import BackendUrl from '../hooks/config';
 
-
-
 class TokenManager {
   static instance;
   refreshPromise = null;
@@ -117,16 +115,16 @@ class TokenManager {
   }
 
   async refreshToken() {
-    const refresh = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjRmYmQ2YzQtNDY2ZS00OTI1LTllYzktZjhkOTgyMDBjZWU1IiwiZXhwIjoxNzQxMDgyMzE3LCJ0b2tlbl90eXBlIjoicmVmcmVzaCJ9.G-JpEt_t2S8r95zC2I81MoAkep5J0mWG_Js3h6rnfMg"
-    // localStorage.getItem('refresh_token');
+    const refresh =  localStorage.getItem('refresh_token');
     if (!refresh) {
       this.showErrorMessage('No refresh token found. Please login again.');
       this.redirectToLogin();
+      localStorage.clear()
       return null;
     }
 
     try {
-      const response = await fetch(`${apibase}/token/refresh/`, {
+      const response = await fetch(`${BackendUrl.file}/token/refresh/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,12 +137,11 @@ class TokenManager {
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.data.access_token);
+      localStorage.setItem('access_token', data.data.access_token);
       return data.data.access_token;
     } catch (error) {
       console.error('Token refresh failed:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('refresh_token');
+       localStorage.clear()
       this.showErrorMessage('Session expired. Redirecting to login...');
       this.redirectToLogin();
       return null;
@@ -152,8 +149,7 @@ class TokenManager {
   }
 
   async getValidToken() {
-    const currentToken =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYjRmYmQ2YzQtNDY2ZS00OTI1LTllYzktZjhkOTgyMDBjZWU1IiwiZW1haWwiOiJrYWxlYmFkZW1raXNob0BnbWFpbC5jb20iLCJmaXJzdF9uYW1lIjoiY2FsYSIsImxhc3RfbmFtZSI6bnVsbCwidXNlcl90eXBlIjoiZ3Vlc3QiLCJleHAiOjE3NDA0ODExMTQsImlhdCI6MTc0MDQ3NzUxNCwidG9rZW5fdHlwZSI6ImFjY2VzcyIsInJvbGUiOiJndWVzdCIsInVzZXJuYW1lIjoiY2FsYSIsImlzX3ZlcmlmaWVkIjp0cnVlfQ.tr7wXpynJOr2qpFvVQsBYR5CO8_B1RF5rCYbG-VqYGo"
-    //localStorage.getItem('token');
+    const currentToken =  localStorage.getItem('access_token');
     if (!currentToken) {
       this.showErrorMessage('No access token found. Please login.');
       this.redirectToLogin();

@@ -25,7 +25,6 @@ class DynamicPermission(permissions.BasePermission):
             request.user.allowed_filter_fields = allowed_filter_fields
             request.user.role = user_role 
 
-            # Handle department_id with proper fallback logic
             department_id = None
             
             if hasattr(request.user, 'department_id'):

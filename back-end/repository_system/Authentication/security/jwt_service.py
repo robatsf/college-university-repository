@@ -105,30 +105,29 @@ class JWTService:
         payload_data = {
             "user_id": str(user.id),
             "email": user.institutional_email if hasattr(user, "institutional_email") else user.email,
-            "first_name":  user.first_name if not user.username else user.username ,
-            "last_name": user.last_name if not user.username else None ,
+            "user_name":  user.first_name +" "+ user.middle_name + " " + user.last_name if not hasattr(user,"username") else user.username ,
             "user_type": user_type,
+            "image_path" : user.profile_image.name if hasattr(user,"profile_image") else None,
             "exp": datetime.utcnow() + timedelta(minutes=60),
             "iat": datetime.utcnow(),
+            
             "token_type": "access"
         }
 
-        if user_type == "student":
+        if user_type in ["teacher","student"]:
             payload_data.update({
-                "role": "student",
                 "year": getattr(user, "year", None),
-                "department": getattr(user, "department", None)
+                "department": getattr(user, "department", None),
+                "department_id": str(user.department_id_id) if user.department_id_id else None
             })
-        elif user_type in ["teacher", "librarian", "department_head"]:
+        elif user_type == "department_head":
             payload_data.update({
-                "role": user_type,
-                "department": getattr(user, "department", None)
+                "department": getattr(user, "department", None),
+                "department_id": str(user.department_id_id) if user.department_id_id else None
             })
         else:  # guest
             payload_data.update({
-                "role": "guest",
-                "username": getattr(user, "username", None),
-                "is_verified": user.is_verified
+                "is_verified":getattr(user, "is_verified", None)
             })
 
         access_token = jwt.encode(payload_data, settings.SECRET_KEY, algorithm="HS256")

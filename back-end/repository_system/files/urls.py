@@ -7,6 +7,7 @@ from .view.FileViewByIdView import FileViewByIdView
 from .view.RefreshTokenViwe import TokenRefreshView
 from .view.approve_fileViwe import approve_file
 from .view.PublicFileSearchViewSet import PublicFileSearchViewSet
+from .view.historyViweSet import get_recent_activities
 
 router = DefaultRouter()
 router.register(r'search', PublicFileSearchViewSet, basename='search')
@@ -21,5 +22,6 @@ urlpatterns = [
     path('view/<uuid:pk>/', FileViewByIdView.as_view(), name='file-view'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('approval/<uuid:pk>/', approve_file, name='approve_file'),
+    path('activities/recent/', get_recent_activities, name='recent-activities'),
     path('', include(router.urls)),
 ]

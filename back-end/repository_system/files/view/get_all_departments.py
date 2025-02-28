@@ -66,7 +66,7 @@ class DepartmentListView(generics.ListAPIView):
     API view to get departments with statistics
     """
     serializer_class = DepartmentListSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def get_queryset(self):
         """

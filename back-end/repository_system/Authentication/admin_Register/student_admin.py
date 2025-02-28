@@ -30,8 +30,6 @@ class StudentAdmin(admin.ModelAdmin):
         css = {
             'all': ('admin/css/student_admin.css',)
         }
-        # Optionally, include JS if needed:
-        # js = ('admin/js/student_admin.js',)
     
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         """
@@ -40,10 +38,8 @@ class StudentAdmin(admin.ModelAdmin):
         """
         if db_field.name == 'department':
             departments = DepartmentList.objects.all()
-            # Build choices: the empty string option is a placeholder.
             department_choices = [('', '--- Select Department ---')]
             for dept in departments:
-                # Use the department name as both the value and display text.
                 department_choices.append((dept.name, dept.name))
             kwargs['widget'] = forms.Select(
                 choices=department_choices,
@@ -108,6 +104,17 @@ class StudentAdmin(admin.ModelAdmin):
         return redirect(request.META.get('HTTP_REFERER', 'admin:users_student_changelist'))
     
     def save_model(self, request, obj, form, change):
+        is_new = not change 
+
+        if is_new:
+            if obj.department and not obj.department_id:
+                department = DepartmentList.objects.filter(name=obj.department).first()
+                if department:
+                    obj.department_id = department
+                else:
+                    self.message_user(request, f"Department '{obj.department}' does not exist.", messages.ERROR)
+                    return
+
         if not obj.institutional_email:
             obj.institutional_email = UserUtils.generate_institutional_email(
                 obj.first_name, obj.last_name, "student"
@@ -119,7 +126,6 @@ class StudentAdmin(admin.ModelAdmin):
             EmailService.send_credentials_email(
                 obj.first_name, obj.email, obj.institutional_email, plain_password,
                 'Your Hudc institutional email as Student has been created.'
-
             )
             self.message_user(request, f"Credentials sent to {obj.email}.", messages.SUCCESS)
         except Exception as e:

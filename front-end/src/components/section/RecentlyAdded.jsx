@@ -47,7 +47,7 @@ export default function RecentlyAdded() {
           <Clock className="h-5 w-5 text-[#0066CC]" />
           <h2 className="text-xl font-semibold text-gray-900">Recently Added</h2>
         </div>
-        <Link to="/recent">
+        {/* <Link to="">
           <Button 
             variant="outline" 
             className="text-[#0066CC] border-[#0066CC]/20 hover:bg-[#0066CC]/5"
@@ -55,7 +55,7 @@ export default function RecentlyAdded() {
             View All
             <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
-        </Link>
+        </Link> */}
       </div>
 
       {/* Recent Items List */}
@@ -65,7 +65,7 @@ export default function RecentlyAdded() {
             key={item.id}
             className="group border-b border-gray-100 pb-6 last:border-0 last:pb-0"
           >
-            <Link to={`/items/${item.id}`}>
+            <Link to={`/fileViwe/${item.id}`}>
               <h3 className="font-medium text-gray-900 group-hover:text-[#0066CC] 
                            transition-colors duration-200 mb-3">
                 {item.title}

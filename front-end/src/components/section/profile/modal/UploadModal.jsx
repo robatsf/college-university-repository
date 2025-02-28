@@ -1,10 +1,10 @@
 import ProjectUploadForm from "../ProjectUploadForm";
-const UploadModal = ({ isOpen, onClose, userDepartment }) => {
+import { X } from "lucide-react";
+const UploadModal = ({ isOpen, onClose, userDepartment,DepartmentId }) => {
   if (!isOpen) return null;
 
   const handleSubmit = (formData) => {
     console.log('Form submitted:', formData);
-    // Add your submission logic here
     onClose();
   };
   
@@ -27,6 +27,7 @@ const UploadModal = ({ isOpen, onClose, userDepartment }) => {
         <div className="p-6">
           <ProjectUploadForm 
             userDepartment={userDepartment} 
+            DepartmentId={DepartmentId}
             onSubmit={handleSubmit}
           />
         </div>
