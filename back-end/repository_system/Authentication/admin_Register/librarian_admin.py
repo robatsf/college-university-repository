@@ -4,6 +4,9 @@ from django.urls import path, reverse
 from django.contrib import messages
 from ..models import Librarian
 from django.shortcuts import redirect
+from Authentication.service.services import UserUtils,EmailService
+from django.contrib.auth.hashers import make_password
+from ..models import DepartmentList
 
 class ProfileImagePreviewMixin:
     """Mixin to display profile image preview in admin panel."""
@@ -94,3 +97,24 @@ class LibrarianAdmin(admin.ModelAdmin, ProfileImagePreviewMixin, StatusIndicator
         return "Librarian"
 
     role.short_description = "Role"
+
+    def save_model(self, request, obj, form, change):
+        if not obj.institutional_email:
+            obj.institutional_email = UserUtils.generate_institutional_email(
+                obj.first_name, obj.last_name, "librarian"
+            )
+        plain_password = UserUtils.generate_password()
+        obj.password = make_password(plain_password)
+        super().save_model(request, obj, form, change)
+        try:
+            EmailService.send_credentials_email(
+                obj.first_name, obj.email, obj.institutional_email, plain_password,
+                'Your Hudc institutional email as librarian has been created.'
+
+            )
+            self.message_user(request, f"Credentials sent to {obj.email}.", messages.SUCCESS)
+        except Exception as e:
+            self.message_user(request, f"Error sending email: {str(e)}", messages.ERROR)
+
+
+

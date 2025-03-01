@@ -61,7 +61,7 @@ const customTheme = createTheme({
 // App component
 const App = () => {
   // librarian,departmentHead
-  const role = localStorage.getItem("role") || "librarian";
+  const role = localStorage.getItem("role") || "departmentHead";
   const resources = roleResources[role] || [];
 
   return (

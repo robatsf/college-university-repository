@@ -7,5 +7,5 @@ from .admin_Register.librarian_admin import LibrarianAdmin
 from .admin_Register.teacher_admin import TeacherAdmin
 
 # Unregister the default User and Group models
-admin.site.unregister(User)
+# admin.site.unregister(User)
 admin.site.unregister(Group)

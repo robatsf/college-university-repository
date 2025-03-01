@@ -50,6 +50,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = [
+    'django_filters',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -59,9 +60,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'Authentication',
-    'Files',
-    'corsheaders',
     'files',
+    'corsheaders',
+    
 ]
 
 MIDDLEWARE = [
@@ -184,3 +185,18 @@ AUTH_PASSWORD_VALIDATORS = [
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
+# change this
+# settings.py
+AUTH_USER_MODEL = 'files.CustomUser'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'Authentication.security.JWTAuthentication.JWTAuthentication',  # Add your custom JWT authentication here
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Ensures authentication is required
+    ],
+}

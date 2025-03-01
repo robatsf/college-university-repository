@@ -4,8 +4,8 @@ from django.urls import path, reverse
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import redirect
 from django import forms
-from .base_admin import BaseModelAdmin  # if needed
-from ..models import Student, DepartmentList
+from ..models import Student
+from files.models import DepartmentList
 from ..service.services import UserUtils, EmailService
 
 @admin.register(Student)
@@ -117,7 +117,9 @@ class StudentAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
         try:
             EmailService.send_credentials_email(
-                obj.first_name, obj.email, obj.institutional_email, plain_password
+                obj.first_name, obj.email, obj.institutional_email, plain_password,
+                'Your Hudc institutional email as Student has been created.'
+
             )
             self.message_user(request, f"Credentials sent to {obj.email}.", messages.SUCCESS)
         except Exception as e:

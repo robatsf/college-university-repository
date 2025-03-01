@@ -3,6 +3,9 @@ from django.urls import path, reverse
 from django.utils.html import format_html
 from django.shortcuts import redirect
 from ..models import Teacher
+from Authentication.service.services import UserUtils,EmailService
+from django.contrib.auth.hashers import make_password
+from files.models import DepartmentList
 
 # Mixins for common admin functionality
 class ProfileImagePreviewMixin:
@@ -101,3 +104,41 @@ class TeacherAdmin(admin.ModelAdmin, ProfileImagePreviewMixin, StatusIndicatorMi
             return obj.department_id.name
         return obj.department
     department_name.short_description = "Department"
+
+    def save_model(self, request, obj, form, change):
+        """Generate institutional email and password for new teachers."""
+        is_new = not change  # Check if it's a new entry
+
+        if is_new:
+            # Fetch existing department without creating a new one
+            if obj.department and not obj.department_id:
+                department = DepartmentList.objects.filter(name=obj.department).first()
+                if department:
+                    obj.department_id = department
+                else:
+                    self.message_user(request, f"Department '{obj.department}' does not exist.", messages.ERROR)
+                    return
+
+            obj.institutional_email = UserUtils.generate_institutional_email(
+                obj.first_name, obj.last_name, "teacher"
+            )
+            
+            plain_password = UserUtils.generate_password()
+            obj.password = make_password(plain_password)
+
+            super().save_model(request, obj, form, change)  # Save before sending email
+
+            try:
+                EmailService.send_credentials_email(
+                    obj.first_name,
+                    obj.email,
+                    obj.institutional_email,
+                    plain_password,
+                    'Your Hudc institutional email as Teacher  has been created.'
+                )
+                self.message_user(request, f"Credentials sent to {obj.email}.", messages.SUCCESS)
+            except Exception as e:
+                self.message_user(request, f"Error sending email: {str(e)}", messages.ERROR)
+        else:
+            super().save_model(request, obj, form, change)
+
