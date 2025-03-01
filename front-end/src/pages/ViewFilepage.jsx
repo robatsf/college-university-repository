@@ -18,7 +18,6 @@ const ViewFilePage = () => {
     setIsSidebarOpen,
     handleDownload,
     handleRequestAccess,
-    viewerConfig,
   } = useDocumentViewer(id);
 
   // Determine if the screen is desktop (md and larger)
@@ -32,10 +31,6 @@ const ViewFilePage = () => {
         <div className="flex-1 bg-gray-50 overflow-auto">
           <SecureWrapper>
             <div className="relative bg-white rounded-lg shadow-lg">
-              {/* Protected View badge visible on mobile only */}
-              <div className="md:hidden absolute top-2 right-2 z-10 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm flex items-center gap-2">
-                <FaShieldAlt className="text-lg" /> Protected View
-              </div>
               <div className="h-[calc(100vh-65px)] select-none">
                 {loading ? (
                   <div className="flex items-center justify-center h-full">
@@ -51,7 +46,6 @@ const ViewFilePage = () => {
                   <div>
                     <CustomPdfViewer
                       encryptedUrl={btoa(fileData.url)}
-                      viewOnly={fileData?.accessLevel === 'view-only'}
                     />
                   </div>
                 )}
@@ -64,10 +58,9 @@ const ViewFilePage = () => {
         <div className="hidden md:block">
           <DocumentSidebar
             fileData={fileData}
-            // Force sidebar to be open in desktop mode regardless of mobile toggle state
             isSidebarOpen={isDesktop ? true : isSidebarOpen}
             setIsSidebarOpen={setIsSidebarOpen}
-            isViewOnly={fileData?.accessLevel === 'view-only'}
+            isViewOnly={fileData?.accessLevel}
             onDownload={handleDownload}
             onRequestAccess={handleRequestAccess}
           />
