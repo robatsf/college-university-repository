@@ -1,11 +1,12 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import { FaShieldAlt, FaEyeSlash } from 'react-icons/fa';
+import { FaShieldAlt, FaEyeSlash, FaBars } from 'react-icons/fa';
+import { useMediaQuery } from '@mui/material';
 import { SecureWrapper } from '../components/document-viewer/SecureWrapper';
 import { DocumentSidebar } from '../components/document-viewer/DocumentSidebar';
 import { useDocumentViewer } from '../hooks/useDocumentViewer';
 import Header from '../components/layout/Header';
-import { setupSecurityListeners } from '../uites/security'
+import CustomPdfViewer from '../components/layout/pdfViewer';
 
 const ViewFilePage = () => {
   const { id } = useParams();
@@ -20,48 +21,21 @@ const ViewFilePage = () => {
     viewerConfig,
   } = useDocumentViewer(id);
 
-  const iframeRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (iframeRef.current) {
-        try {
-          const iDoc =
-            iframeRef.current.contentDocument ||
-            iframeRef.current.contentWindow.document;
-          if (cleanup) cleanup();
-        } catch (err) {
-          console.error('Error during iframe cleanup:', err);
-        }
-      }
-    };
-  }, []);
-
-  const handleIframeLoad = (e) => {
-    try {
-      const iDoc =
-        e.target.contentDocument || e.target.contentWindow.document;
-      if (iDoc) {
-        // Apply security listeners to the iframe's document.
-        setupSecurityListeners(iDoc);
-      }
-    } catch (error) {
-      console.error('Error setting up security listeners on iframe', error);
-    }
-  };
+  // Determine if the screen is desktop (md and larger)
+  const isDesktop = useMediaQuery('(min-width:768px)');
 
   return (
     <div className="flex flex-col h-screen">
       <Header />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {/* Main Document View */}
         <div className="flex-1 bg-gray-50 overflow-auto">
           <SecureWrapper>
             <div className="relative bg-white rounded-lg shadow-lg">
-              <div className="absolute top-6 right-8 z-10 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm flex items-center gap-2">
-                <FaShieldAlt /> Protected View
+              {/* Protected View badge visible on mobile only */}
+              <div className="md:hidden absolute top-2 right-2 z-10 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm flex items-center gap-2">
+                <FaShieldAlt className="text-lg" /> Protected View
               </div>
-
               <div className="h-[calc(100vh-65px)] select-none">
                 {loading ? (
                   <div className="flex items-center justify-center h-full">
@@ -74,40 +48,62 @@ const ViewFilePage = () => {
                     </div>
                   </div>
                 ) : (
-                  <iframe
-                  ref={iframeRef}
-                  src={fileData.url}
-                  title="Document Viewer"
-                  style={{ 
-                    height: '100%', 
-                    width: '100%', 
-                    border: 'none',
-                    userSelect: "none",
-                    WebkitUserSelect: "none",
-                    MozUserSelect: "none",
-                    msUserSelect: "none",
-                    overflow: "hidden",
-                    scrollbarWidth: "none",
-                    msOverflowStyle: "none" 
-                  }}
-                  className="overflow-hidden no-scrollbar"
-                  onLoad={handleIframeLoad}
-                />
-                
+                  <div>
+                    <CustomPdfViewer
+                      encryptedUrl={btoa(fileData.url)}
+                      viewOnly={fileData?.accessLevel === 'view-only'}
+                    />
+                  </div>
                 )}
               </div>
             </div>
           </SecureWrapper>
         </div>
 
-        <DocumentSidebar
-          fileData={fileData}
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-          isViewOnly={fileData?.accessLevel === 'view-only'}
-          onDownload={handleDownload}
-          onRequestAccess={handleRequestAccess}
-        />
+        {/* Desktop Sidebar (always visible on md and larger screens) */}
+        <div className="hidden md:block">
+          <DocumentSidebar
+            fileData={fileData}
+            // Force sidebar to be open in desktop mode regardless of mobile toggle state
+            isSidebarOpen={isDesktop ? true : isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+            isViewOnly={fileData?.accessLevel === 'view-only'}
+            onDownload={handleDownload}
+            onRequestAccess={handleRequestAccess}
+          />
+        </div>
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-30 flex">
+          {/* Semi-transparent overlay */}
+          <div
+            className="fixed inset-0 bg-black opacity-50"
+            onClick={() => setIsSidebarOpen(false)}
+          ></div>
+          {/* Sidebar sliding in from the right */}
+          <div className="relative ml-auto w-80 bg-white shadow-lg">
+            <DocumentSidebar
+              fileData={fileData}
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
+              isViewOnly={fileData?.accessLevel === 'view-only'}
+              onDownload={handleDownload}
+              onRequestAccess={handleRequestAccess}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Toggle Button */}
+      <div className="md:hidden fixed bottom-4 right-4 z-40">
+        <button
+          onClick={() => setIsSidebarOpen((prev) => !prev)}
+          className="bg-blue-500 text-white p-3 rounded-full shadow-lg focus:outline-none"
+        >
+          <FaBars size={24} />
+        </button>
       </div>
     </div>
   );

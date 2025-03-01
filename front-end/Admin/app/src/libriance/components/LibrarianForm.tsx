@@ -54,8 +54,6 @@ export const LibrarianForm: React.FC<LibrarianFormProps> = ({
           label="Upload File"
           accept={{
             "application/pdf": [".pdf"],
-            "application/msword": [".doc"],
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
           }}
           validate={!isEdit ? [required()] : undefined}
         >
