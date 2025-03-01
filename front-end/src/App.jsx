@@ -13,6 +13,7 @@ import Browserdetails from './pages/BrowseDetail';
 import FilePage from './pages/ViewFilepage';
 import TermsAndPrivacyPolicy from './pages/TermsAndPrivacyPolicy';
 import TeacherDashboard from './pages/teacherDasbord';
+import LibrarianDashboard from './pages/LibrarianDashboard'; 
 
 // Auth guard component
 const PrivateRoute = ({ children }) => {
@@ -42,6 +43,14 @@ const AppRoutes = () => {
               <Profile />
             </PrivateRoute>
           }
+        />
+        <Route 
+        path="/LibrarianDashboard" 
+        element={
+        <PrivateRoute>
+        <LibrarianDashboard />
+        </PrivateRoute>
+        } 
         />
          <Route path="/TeacherDashboard"
           element={ <TeacherDashboard/> }
