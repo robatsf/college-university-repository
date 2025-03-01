@@ -1,155 +1,211 @@
-// components/sections/Communities.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, ChevronRight, Users, BookOpen, GraduationCap } from 'lucide-react';
+import { Building2, ChevronRight, Users, BookOpen } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useDepartments } from '../../hooks/useDepartments';
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+  Skeleton
+} from '@mui/material';
 
-export default function Communities() {
-  const communities = [
-    { 
-      title: 'College of Computing',
-      items: 1234,
-      icon: BookOpen,
-      description: 'Computer Science, Information Technology, and Digital Innovation',
-      recentUpdates: 23,
-      color: 'blue'
-    },
-    { 
-      title: 'College of Engineering',
-      items: 2567,
-      icon: Building2,
-      description: 'Mechanical, Electrical, and Civil Engineering Research',
-      recentUpdates: 45,
-      color: 'orange'
-    },
-    { 
-      title: 'College of Business',
-      items: 987,
-      icon: Users,
-      description: 'Business Administration, Economics, and Management',
-      recentUpdates: 15,
-      color: 'green'
-    },
-    { 
-      title: 'College of Sciences',
-      items: 1789,
-      icon: GraduationCap,
-      description: 'Physics, Chemistry, Biology, and Mathematics',
-      recentUpdates: 32,
-      color: 'purple'
-    }
-  ];
+export default function Departments() {
+  const { departments, isLoading, error, stats, colorVariants } = useDepartments();
 
-  const colorVariants = {
-    blue: 'bg-blue-50 text-blue-600 border-blue-100',
-    orange: 'bg-orange-50 text-orange-600 border-orange-100',
-    green: 'bg-green-50 text-green-600 border-green-100',
-    purple: 'bg-purple-50 text-purple-600 border-purple-100'
-  };
+  // Loading state with Material UI Skeletons
+  if (isLoading) {
+    return (
+      <Card sx={{ p: 2, borderRadius: 2, boxShadow: 1, backgroundColor: 'white' }}>
+        <Skeleton variant="text" width="33%" height={32} />
+        <Skeleton variant="text" width="50%" height={24} sx={{ mb: 3 }} />
+        <Grid container spacing={2}>
+          {[1, 2, 3, 4].map((i) => (
+            <Grid item xs={12} md={6} key={i}>
+              <Card variant="outlined" sx={{ p: 2 }}>
+                <Grid container spacing={2}>
+                  <Grid item>
+                    <Skeleton variant="rectangular" width={48} height={48} />
+                  </Grid>
+                  <Grid item xs>
+                    <Skeleton variant="text" width="75%" height={20} sx={{ mb: 1 }} />
+                    <Skeleton variant="text" width="50%" height={16} />
+                  </Grid>
+                </Grid>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Card>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Box
+        sx={{
+          backgroundColor: 'white',
+          p: 2,
+          borderRadius: 2,
+          boxShadow: 1,
+          textAlign: 'center',
+          color: 'red'
+        }}
+      >
+        Error loading departments
+      </Box>
+    );
+  }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md 
-                    transition-all duration-300">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Communities in IR</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Browse research works by academic communities
-          </p>
-        </div>
-        <Link to="/communities">
-          <Button variant="outline" className="text-[#0066CC] border-[#0066CC]/20 
-                                            hover:bg-[#0066CC]/10">
-            View All
-            <ChevronRight className="ml-2 h-4 w-4" />
-          </Button>
-        </Link>
-      </div>
-
-      {/* Communities Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {communities.map((community) => (
-          <Link 
-            key={community.title} 
-            to={`/communities/${community.title.toLowerCase().replace(/\s+/g, '-')}`}
-          >
-            <div className="group p-4 border-2 border-gray-100 rounded-lg 
-                          hover:border-[#0066CC]/20 transition-all duration-300 
-                          hover:shadow-md">
-              <div className="flex items-start space-x-4">
-                {/* Icon */}
-                <div className={`p-3 rounded-lg transition-colors duration-300 
-                               ${colorVariants[community.color]}`}>
-                  <community.icon className="h-6 w-6" />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-gray-900 group-hover:text-[#0066CC] 
-                                   transition-colors duration-300">
-                        {community.title}
-                      </h3>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {community.description}
-                      </p>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400 
-                                          group-hover:text-[#0066CC] 
-                                          group-hover:transform group-hover:translate-x-1 
-                                          transition-all" />
-                  </div>
-
-                  {/* Stats */}
-                  <div className="flex items-center space-x-4 mt-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <BookOpen className="h-4 w-4 mr-1" />
-                      <span>{community.items.toLocaleString()} items</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Users className="h-4 w-4 mr-1" />
-                      <span>{community.recentUpdates} recent updates</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <Card
+      sx={{
+        p: 2,
+        borderRadius: 2,
+        boxShadow: 1,
+        backgroundColor: 'white',
+        transition: 'box-shadow 0.3s',
+        '&:hover': { boxShadow: 2 }
+      }}
+    >
+      <CardContent>
+        {/* Header */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+              Academic Departments
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Browse research works by department
+            </Typography>
+          </Box>
+          {/* 
+          Uncomment and adjust the button if you need the "View All" functionality
+          <Link to="/departments" style={{ textDecoration: 'none' }}>
+            <Button
+              variant="outlined"
+              sx={{
+                color: '#0066CC',
+                borderColor: '#0066CC',
+                '&:hover': { backgroundColor: '#E0F2FF' }
+              }}
+            >
+              View All
+              <ChevronRight style={{ marginLeft: 4 }} />
+            </Button>
           </Link>
-        ))}
-      </div>
+          */}
+        </Box>
 
-      {/* Summary Stats */}
-      <div className="mt-6 pt-6 border-t border-gray-100">
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-[#0066CC]">
-              {communities.reduce((acc, curr) => acc + curr.items, 0).toLocaleString()}
-            </div>
-            <div className="text-sm text-gray-600">Total Items</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-[#0066CC]">
-              {communities.length}
-            </div>
-            <div className="text-sm text-gray-600">Communities</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-[#0066CC]">
-              {communities.reduce((acc, curr) => acc + curr.recentUpdates, 0)}
-            </div>
-            <div className="text-sm text-gray-600">Recent Updates</div>
-          </div>
-        </div>
-      </div>
+        {/* Departments Grid */}
+        <Grid container spacing={2}>
+          {departments.map((dept, index) => (
+            <Grid item xs={12} md={6} key={dept.name}>
+              <Link
+                to={`browsedetail/?departemnt=${dept.name}`}
+                style={{ textDecoration: 'none' }}
+              >
+                <Card
+                  variant="outlined"
+                  sx={{
+                    p: 2,
+                    transition: 'all 0.3s',
+                    '&:hover': { borderColor: '#0066CC', boxShadow: 3 }
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                    {/* Icon */}
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 1,
+                        backgroundColor: colorVariants[index % 4],
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <Building2 size={24} />
+                    </Box>
 
-      {/* Optional: Loading State */}
-      {/* {isLoading && (
-        <div className="animate-pulse">
-          // ... loading skeleton
-        </div>
-      )} */}
-    </div>
+                    {/* Content */}
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{
+                            fontWeight: 500,
+                            transition: 'color 0.3s',
+                            '&:hover': { color: '#0066CC' }
+                          }}
+                        >
+                          {dept.name}
+                        </Typography>
+                        <ChevronRight style={{ marginLeft: 8, color: '#ccc', transition: 'all 0.3s' }} />
+                      </Box>
+
+                      {/* Stats */}
+                      <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <BookOpen size={16} />
+                          <Typography variant="caption" color="text.secondary">
+                            {dept.count.toLocaleString()} items
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Users size={16} />
+                          <Typography variant="caption" color="text.secondary">
+                            Last updated: {new Date(dept.latest_file).toLocaleDateString()}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Card>
+              </Link>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Summary Stats */}
+        <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid', borderColor: 'grey.300' }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={4}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0066CC' }}>
+                  {stats.totalItems.toLocaleString()}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Total Items
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0066CC' }}>
+                  {stats.totalDepartments}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Departments
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#0066CC' }}>
+                  {stats.latestUpdate ? stats.latestUpdate.toLocaleDateString() : '-'}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Latest Update
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+      </CardContent>
+    </Card>
   );
 }

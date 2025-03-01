@@ -82,6 +82,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
+
+
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",
@@ -101,7 +104,11 @@ CORS_ALLOW_HEADERS = [
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
+    "range", 
+    "content-range"
 ]
+CORS_EXPOSE_HEADERS = ["Content-Range"] 
+
 
 ROOT_URLCONF = 'repository_system.urls'
 
@@ -194,9 +201,17 @@ AUTH_USER_MODEL = 'files.CustomUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'Authentication.security.JWTAuthentication.JWTAuthentication',  # Add your custom JWT authentication here
+        'Authentication.security.JWTAuthentication.JWTAuthentication', 
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # Ensures authentication is required
+        'files.permissions.DynamicPermission', 
     ],
 }
+
+# Allow embedding in iframes
+X_FRAME_OPTIONS = 'ALLOWALL'
+
+# Ensure CSRF protection does not block requests
+CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000"]
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = None

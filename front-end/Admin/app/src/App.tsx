@@ -3,7 +3,7 @@ import {Login, Admin, Layout, LayoutProps, AppBar as RaAppBar, AppBarProps } fro
 import { Box, Typography } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {roleResources,CustomLayout} from './layout/CustomLayout';
-import { dataProvider } from './dataProvider';
+import  customDataProvider  from './dataProvider';
 import LibrarianDashboard from './libriance/LibrarianDashboard';
 import DepartmentDashboard from './departemnt_head/DepartmentDashboard';
 
@@ -21,7 +21,7 @@ const CustomAppBar = (props: AppBarProps) => (
           marginRight: '10px'
         }}
       />
-      <Typography variant="h6">HUDC IR SYSTEM</Typography>
+      <Typography variant="h6">HUDC IR</Typography>
     </Box>
   </RaAppBar>
 );
@@ -61,14 +61,18 @@ const customTheme = createTheme({
 // App component
 const App = () => {
   // librarian,departmentHead
-  const role = localStorage.getItem("role") || "departmentHead";
+  const role =  localStorage.getItem("user_type") || "departmentHead"
   const resources = roleResources[role] || [];
+
+  if (!["librarian", "departmenthead"].includes(role)) {
+    window.location.href = "/login";
+  }
 
   return (
     <Admin
       title="HUDC IR SYSTEM"
       layout={CustomLayout}
-      dataProvider={dataProvider}
+      dataProvider={customDataProvider}
       darkTheme={null}
       login={Login}
       dashboard={role === "departmentHead" ? DepartmentDashboard : LibrarianDashboard}

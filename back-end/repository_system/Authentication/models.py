@@ -13,6 +13,12 @@ class Student(models.Model):
     middle_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255)
     department = models.CharField(max_length=255)
+    department_id = models.ForeignKey(
+        DepartmentList,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
     year = models.IntegerField()
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     email = models.EmailField(unique=True,null=True)  # Personal email

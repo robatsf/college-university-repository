@@ -1,7 +1,5 @@
-// src/components/UpdatePassword.tsx
 import React from 'react';
 import {
-  Create,
   SimpleForm,
   TextInput,
   required,
@@ -10,9 +8,10 @@ import {
   SaveButton,
   Toolbar,
 } from "react-admin";
-import { Card, CardContent, Typography, Box } from '@mui/material';
+import { CardContent, Typography, Box } from '@mui/material';
+import customDataProvider from '../dataProvider'; // adjust the import path accordingly
 
-// Custom validation
+// Custom validation for matching passwords
 const validatePasswordMatch = (value, allValues) => {
   if (value !== allValues.newPassword) {
     return 'Passwords do not match';
@@ -20,13 +19,14 @@ const validatePasswordMatch = (value, allValues) => {
   return undefined;
 };
 
+// Custom validation for password requirements
 const validatePassword = (value) => {
   if (!value) return 'Required';
   if (value.length < 8) return 'Password must be at least 8 characters';
   return undefined;
 };
 
-// Custom toolbar
+// Custom toolbar with centered Save button
 const CustomToolbar = props => (
   <Toolbar {...props} sx={{ display: 'flex', justifyContent: 'center' }}>
     <SaveButton label="Update Password" />
@@ -37,61 +37,68 @@ export const UpdateDepartemntPassword = () => {
   const notify = useNotify();
   const redirect = useRedirect();
 
-  const onSuccess = () => {
-    notify('Password updated successfully');
-    redirect('/');
+  // Manual submit handler calling the data provider
+  const handleSubmit = async (data) => {
+    try {
+      // Transform the data to match your backend expected fields
+      const transformedData = {
+        old_password: data.oldPassword,
+        new_password: data.newPassword,
+      };
+
+      // Call the custom data provider for "change-password"
+      await customDataProvider.create("change-password", { data: transformedData });
+      notify("Password updated successfully", { type: "success" });
+      redirect("/");
+    } catch (error) {
+      notify(`Error: ${error.message}`, { type: "error" });
+    }
   };
 
   return (
     <Box>
-        <CardContent>
-          <Typography >
-            Update Password
-          </Typography>
-          
-          <Create
-            resource="updatePassword"
-            redirect="/"
-            mutationOptions={{ onSuccess }}
-          >
-            <SimpleForm 
-              toolbar={<CustomToolbar />}
-              sx={{
-                '& .RaSimpleForm-form': {
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 2,
-                },
-              }}
-            >
-              <TextInput
-                source="oldPassword"
-                label="Current Password"
-                type="password"
-                fullWidth
-                validate={[required()]}
-                sx={{ mb: 2 }}
-              />
-              <TextInput
-                source="newPassword"
-                label="New Password"
-                type="password"
-                fullWidth
-                validate={[required(), validatePassword]}
-                helperText="Password must be at least 8 characters"
-                sx={{ mb: 2 }}
-              />
-              <TextInput
-                source="confirmPassword"
-                label="Confirm New Password"
-                type="password"
-                fullWidth
-                validate={[required(), validatePasswordMatch]}
-                sx={{ mb: 2 }}
-              />
-            </SimpleForm>
-          </Create>
-        </CardContent>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Update Password
+        </Typography>
+        <SimpleForm
+          onSubmit={handleSubmit}  // Use our custom submit handler
+          toolbar={<CustomToolbar />}
+          sx={{
+            '& .RaSimpleForm-form': {
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+            },
+          }}
+        >
+          <TextInput
+            source="oldPassword"
+            label="Current Password"
+            type="password"
+            fullWidth
+            validate={[required()]}
+            sx={{ mb: 2 }}
+          />
+          <TextInput
+            source="newPassword"
+            label="New Password"
+            type="password"
+            fullWidth
+            validate={[required(), validatePassword]}
+            helperText="Password must be at least 8 characters"
+            sx={{ mb: 2 }}
+          />
+          <TextInput
+            source="confirmPassword"
+            label="Confirm New Password"
+            type="password"
+            fullWidth
+            validate={[required(), validatePasswordMatch]}
+            sx={{ mb: 2 }}
+          />
+        </SimpleForm>
+      </CardContent>
     </Box>
   );
 };
