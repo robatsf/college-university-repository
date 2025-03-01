@@ -17,10 +17,21 @@ import HelpPage from './pages/help';
 
 
 // Auth guard component
-const PrivateRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('token'); // Check if user is authenticated
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+const PrivateRoute = ({ children, allowedRoles }) => {
+  const isAuthenticated = localStorage.getItem('access_token');
+  const userType = localStorage.getItem('user_type');
+  
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!allowedRoles.includes(userType)) return <Navigate to="/" replace />;
+  
+  return children;
 };
+
+// 'departmenthead': 'department_head',
+// 'teacher': 'teacher',
+// 'student': 'student',
+// 'librarian': 'librarian'
+
 
 const AppRoutes = () => {
   return (
@@ -35,7 +46,12 @@ const AppRoutes = () => {
         <Route path="/browsedetail/*" element={<Browserdetails />} />
         <Route path="/TermsAndPrivacyPolicy" element={<TermsAndPrivacyPolicy />} />
         <Route path="/help" element={<HelpPage />} />
-        <Route path='/dashboard' element={<iframe src="/dist/index.html" style={{ width: "100%", height: "100vh", border: "none" }} />} />
+        <Route path='/dashboard'
+        element={
+          <PrivateRoute allowedRoles={['department_head',"departmenthead", 'librarian',"librarian"]}>
+             <iframe src="/dist/index.html" style={{ width: "100%", height: "100vh", border: "none" }} />
+          </PrivateRoute>
+       } />
 
 
 
@@ -43,22 +59,22 @@ const AppRoutes = () => {
         <Route
           path="/Profile/student"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={['student']}>
               <Studentdashboard />
-           </PrivateRoute>
+              </PrivateRoute >
           }
         />
          <Route path="/Profile/teacher"
           element={ 
-          <PrivateRoute>
+            <PrivateRoute allowedRoles={['teacher']}>
           <TeacherDashboard/> 
-         </PrivateRoute>
+          </PrivateRoute >
           }/>
 
         <Route
           path="/fileViwe/:id"
           element={
-           <PrivateRoute>
+           <PrivateRoute allowedRoles={['department_head',"teacher", 'librarian',"student"]}>
               <FileViewerPage />
            </PrivateRoute>
           }

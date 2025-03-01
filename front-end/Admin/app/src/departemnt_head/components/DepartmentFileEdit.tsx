@@ -42,8 +42,6 @@ const DepartmentFileEdit = (props) => {
           label="Upload File" 
           accept={{
             "application/pdf": [".pdf"], 
-            "application/msword": [".doc"], 
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"]
           }} 
         >
           <FileField source="src" title="title" />
