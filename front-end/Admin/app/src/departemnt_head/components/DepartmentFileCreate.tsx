@@ -25,7 +25,7 @@ const DepartmentFileCreate = () => {
         <TextInput source="author" label="Author Name" fullWidth validate={[required()]} />
         <TextInput source="department" label="Department" defaultValue="Default Department" fullWidth disabled />
         <TextInput source="description" label="Project/Research Description" multiline fullWidth validate={[required()]} />
-        <FileInput source="file" label="Upload File" accept={{ "application/pdf": [".pdf"], "application/msword": [".doc"], "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"] }} validate={[required()]}>
+        <FileInput source="file" label="Upload File" accept={{ "application/pdf": [".pdf"]}} validate={[required()]}>
           <FileField source="src" title="title" />
         </FileInput>
       </SimpleForm>

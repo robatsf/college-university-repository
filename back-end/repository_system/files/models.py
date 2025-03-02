@@ -47,7 +47,6 @@ class DepartmentList(models.Model):
 class Request(models.Model):
     user_request_id = models.UUIDField()
     requested_file_id = models.UUIDField()
-    created_at = models.DateTimeField(default=now)
     updated_time = models.DateTimeField(auto_now=True)
     description = models.CharField(max_length=255)
     status = models.CharField(max_length=50)

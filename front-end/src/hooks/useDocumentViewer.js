@@ -41,8 +41,8 @@ export const useDocumentViewer = () => {
         const data = await response.json();
         if (!data.file_url) throw new Error("Invalid response from server");
 
-        // Construct fileData using defaults and values from the response.
         const fileDataFromResponse = {
+          id : data.id,
           url: data.file_url,
           title: data.title || "unknown",
           author: data.author || "Unknown",
@@ -52,13 +52,13 @@ export const useDocumentViewer = () => {
           extension: data.file_extension || "pdf",
           size: data.size || "Unknown",
           category: data.category || "Uncategorized",
-          accessLevel: data.accessLevel || "view-only",
+          accessLevel: data.accessLevel,
+          RequestAccess : data.asked_request
         };
 
         if (isActive) {
           setFileData(fileDataFromResponse);
           setLoading(false);
-          toast.success("Document loaded successfully", { autoClose: 3000 });
         }
       } catch (err) {
         if (isActive) {
@@ -77,31 +77,34 @@ export const useDocumentViewer = () => {
     };
   }, [docId]);
 
-  // Function to handle document download.
   const handleDownload = async () => {
-    if (!fileData?.url) {
-      console.error("No file URL provided");
+    if (!docId) {
+      toast.warn("Invalid document ID", { autoClose: 3000 });
       return false;
     }
+  
     try {
-      const response = await fetch(`${BackendUrl.file}/documents/${docId}/download`, {
-        method: 'POST',
+      const response = await fetch(`${BackendUrl.file}/documents/${docId}/download/`, {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${await tokenManager.getAuthHeaders()}`,
         },
       });
-      if (!response.ok) throw new Error("Failed to track download");
+  
+      if (!response.ok) {
+        throw new Error(`Failed to download document: ${response.statusText}`);
+      }
+      const blob = await response.blob();
+      const fileName = fileData?.title || `document_${docId}`;
 
-      // Trigger the download by creating a temporary link.
-      const link = document.createElement('a');
-      link.href = fileData.url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
+  
+      toast.success("Download started", { autoClose: 3000 });
       return true;
     } catch (err) {
       console.error("Error downloading document:", err);
@@ -109,54 +112,44 @@ export const useDocumentViewer = () => {
       return false;
     }
   };
+  
 
   // Function to handle access requests.
   const handleRequestAccess = async () => {
-    if (!docId) return false;
+    if (!docId) {
+      toast.warn("Invalid document ID", { autoClose: 3000 });
+      return false;
+    }
+  
     try {
-      const response = await fetch(`${BackendUrl.file}/documents/${docId}/request-access`, {
+      const response = await fetch(`${BackendUrl.file}/request-access/${docId}/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${await tokenManager.getAuthHeaders()}`,
         },
-        body: JSON.stringify({ documentId: docId, requestType: 'full-access' }),
       });
-      if (!response.ok) throw new Error("Failed to request access");
-
-      const data = await response.json();
-      if (data.success) {
+  
+      const data = await response.json().catch(() => null)
+  
+      if (!response.ok) {
+        throw new Error(data?.message || "Failed to request access");
+      }
+  
         setFileData((prev) => ({
           ...prev,
-          accessLevel: 'pending',
+          RequestAccess : true
         }));
         toast.success("Access requested successfully", { autoClose: 3000 });
-      }
-      return data.success;
+        return true;
+      
     } catch (err) {
       console.error("Error requesting access:", err);
-      toast.error("Error requesting access", { autoClose: 3000 });
+      toast.error(err.message || "Error requesting access", { autoClose: 3000 });
       return false;
     }
   };
-
-  // Viewer configuration that can be passed to your document viewer component.
-  const viewerConfig = {
-    header: {
-      disableHeader: false,
-      disableFileName: false,
-    },
-    iframeProps: {
-      sandbox: "allow-scripts allow-same-origin",
-    },
-    defaultScale: 1.2,
-    allowDragging: true,
-    allowZoom: true,
-    allowPrint: true,
-    allowDownload: true,
-    allowFullScreen: true,
-    renderMode: 'canvas',
-  };
+  
 
   return {
     fileData,
@@ -166,7 +159,6 @@ export const useDocumentViewer = () => {
     setIsSidebarOpen,
     handleDownload,
     handleRequestAccess,
-    viewerConfig,
   };
 };
 
