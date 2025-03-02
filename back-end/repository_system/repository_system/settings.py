@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'Authentication',
     'files',
     'corsheaders',
+    
 ]
 
 MIDDLEWARE = [

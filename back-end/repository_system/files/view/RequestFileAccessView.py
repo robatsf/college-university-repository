@@ -25,7 +25,7 @@ class RequestFileAccessView(APIView):
         new_request = Request.objects.create(
             user_request_id=user_id,
             requested_file_id=pk,
-            description=f"User {getattr(request.user,"username") if hasattr(request.user,"username") else "user"} with email {request.user.email} requested access to {file_instance.title}.",
+            description=f"User {getattr(request.user,'username') if hasattr(request.user,'username') else 'user'} with email {request.user.email} requested access to {file_instance.title}.",
             status="Pending"
         )
 

@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Admin, Layout, LayoutProps, AppBar as RaAppBar, AppBarProps } from 'react-admin';
+import {Login, Admin, Layout, LayoutProps, AppBar as RaAppBar, AppBarProps } from 'react-admin';
 import { Box, Typography } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {roleResources,CustomLayout} from './layout/CustomLayout';
@@ -60,11 +60,11 @@ const customTheme = createTheme({
 
 // App component
 const App = () => {
-  // librarian,departmentHead
-  const role =  localStorage.getItem("user_type") || "departmentHead"
+  // librarian,department_head
+  const role =  localStorage.getItem("user_type")
   const resources = roleResources[role] || [];
 
-  if (!["librarian", "departmenthead"].includes(role)) {
+  if (!["librarian", "department_head"].includes(role)) {
     window.location.href = "/login";
   }
 
@@ -74,7 +74,8 @@ const App = () => {
       layout={CustomLayout}
       dataProvider={customDataProvider}
       darkTheme={null}
-      dashboard={role === "departmentHead" ? DepartmentDashboard : LibrarianDashboard}
+      login={Login}
+      dashboard={role === "department_head" ? DepartmentDashboard : LibrarianDashboard}
     >
       {resources}
     </Admin>
