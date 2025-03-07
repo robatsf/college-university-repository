@@ -60,11 +60,11 @@ const customTheme = createTheme({
 
 // App component
 const App = () => {
-  // librarian,departmentHead
-  const role =  localStorage.getItem("user_type") || "departmentHead"
+  // librarian,department_head
+  const role =  localStorage.getItem("user_type") || "department_head"
   const resources = roleResources[role] || [];
 
-  if (!["librarian", "departmenthead"].includes(role)) {
+  if (!["librarian", "department_head"].includes(role)) {
     window.location.href = "/login";
   }
 
@@ -74,7 +74,7 @@ const App = () => {
       layout={CustomLayout}
       dataProvider={customDataProvider}
       darkTheme={null}
-      dashboard={role === "departmentHead" ? DepartmentDashboard : LibrarianDashboard}
+      dashboard={role === "department_head" ? DepartmentDashboard : LibrarianDashboard}
     >
       {resources}
     </Admin>

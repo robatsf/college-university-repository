@@ -46,7 +46,7 @@ JAZZMIN_SETTINGS = {
         "Authentication.student": "fas fa-user-graduate",    # Student model
         "Authentication.Teacher": "fas fa-user-tie", 
         "Authentication.guest": "fas fa-user-secret",          # Guest model
-        "Authentication.request": "fas fa-envelope-open-text", # Request model
+        "Authentication.request": "fas fa-envelope-open-texcollege-university-repositoryt", # Request model
         "Authentication.filesystem": "fas fa-folder-open",     # FileSystem model
         "Authentication.history": "fas fa-history",            # History model
         "Authentication.permissions": "fas fa-key",            # Permissions model
@@ -57,7 +57,8 @@ JAZZMIN_SETTINGS = {
         "Authentication.DepartmentHead": "fas fa-chalkboard-teacher",
         "Files.PermissionSetting": "fas fa-user-shield",
         "Files.Request": "fas fa-user-cog",
-        "Files.Departmentlist": "fas fa-clipboard-list"
+        "Files.Departmentlist": "fas fa-clipboard-list",
+        "Files.Filesystem": "fas fa-folder-open"
 
     },
 

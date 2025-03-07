@@ -5,6 +5,7 @@ import { json } from "stream/consumers";
 import { NONAME } from "dns";
 
 export const apibase = "http://127.0.0.1:8000/api/files"
+export const api = "http://127.0.0.1:8000/media/"
 const httpClient = fetchUtils.fetchJson;
 
 // Base provider

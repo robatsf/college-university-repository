@@ -1,4 +1,3 @@
-// hooks/usePasswordUpdate.js
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
@@ -101,16 +100,17 @@ export const usePasswordUpdate = () => {
 
   const updatePassword = async (data) => {
     setIsLoading(true);
+    const token =  await tokenManager.getAuthHeaders();
 
     try {
       const response = await fetch(`${BackendUrl.file}/change-password/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${await tokenManager.getAuthHeaders()}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          current_password: data.currentPassword,
+          old_password: data.currentPassword,
           new_password: data.newPassword,
         }),
       });
@@ -123,8 +123,26 @@ export const usePasswordUpdate = () => {
             type: 'manual',
             message: 'Current password is incorrect',
           });
+        } else if (responseData.old_password) {
+          // Handle specific error for old password
+          setError('currentPassword', {
+            type: 'manual',
+            message: Array.isArray(responseData.old_password) 
+              ? responseData.old_password[0] 
+              : responseData.old_password,
+          });
+        } else if (responseData.new_password) {
+          // Handle specific error for new password
+          setError('newPassword', {
+            type: 'manual',
+            message: Array.isArray(responseData.new_password) 
+              ? responseData.new_password[0] 
+              : responseData.new_password,
+          });
+        } else {
+          throw new Error(responseData.message || responseData.detail || 'Failed to update password');
         }
-        throw new Error(responseData.message || 'Failed to update password');
+        return false;
       }
 
       reset();

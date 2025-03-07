@@ -1,12 +1,14 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { FaShieldAlt, FaEyeSlash, FaBars } from 'react-icons/fa';
+import { useParams,Link } from 'react-router-dom';
+import {  FaEyeSlash, FaBars } from 'react-icons/fa';
+import {Home } from 'lucide-react';
 import { useMediaQuery } from '@mui/material';
 import { SecureWrapper } from '../components/document-viewer/SecureWrapper';
 import { DocumentSidebar } from '../components/document-viewer/DocumentSidebar';
 import { useDocumentViewer } from '../hooks/useDocumentViewer';
 import Header from '../components/layout/Header';
 import CustomPdfViewer from '../components/layout/pdfViewer';
+import Agentview from "../Agent/Agentview"
 
 const ViewFilePage = () => {
   const { id } = useParams();
@@ -24,7 +26,18 @@ const ViewFilePage = () => {
   const isDesktop = useMediaQuery('(min-width:768px)');
 
   return (
+    <>
     <div className="flex flex-col h-screen">
+
+    <Link
+        to="/"
+        className="absolute top-10 left-4 p-2 rounded-full bg-white 
+                   shadow-lg hover:shadow-xl transition-all duration-200 
+                   group hover:scale-105 z-50"
+      >
+        <Home className="h-5 w-5 text-[#0066CC] group-hover:text-[#0052A3]" />
+      </Link>
+
       <Header />
       <div className="flex flex-1 overflow-hidden relative">
         {/* Main Document View */}
@@ -53,6 +66,7 @@ const ViewFilePage = () => {
             </div>
           </SecureWrapper>
         </div>
+        {/* <Agentview  id={fileData?.id}/> */}
 
         {/* Desktop Sidebar (always visible on md and larger screens) */}
         <div className="hidden md:block">
@@ -77,14 +91,14 @@ const ViewFilePage = () => {
           ></div>
           {/* Sidebar sliding in from the right */}
           <div className="relative ml-auto w-80 bg-white shadow-lg">
-            <DocumentSidebar
-              fileData={fileData}
-              isSidebarOpen={isSidebarOpen}
-              setIsSidebarOpen={setIsSidebarOpen}
-              isViewOnly={fileData?.accessLevel === 'view-only'}
-              onDownload={handleDownload}
-              onRequestAccess={handleRequestAccess}
-            />
+          <DocumentSidebar
+            fileData={fileData}
+            isSidebarOpen={isDesktop ? true : isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+            isViewOnly={fileData?.accessLevel}
+            onDownload={handleDownload}
+            onRequestAccess={handleRequestAccess}
+          />
           </div>
         </div>
       )}
@@ -99,6 +113,7 @@ const ViewFilePage = () => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 

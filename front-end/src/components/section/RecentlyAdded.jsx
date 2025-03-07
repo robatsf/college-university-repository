@@ -88,7 +88,7 @@ export default function RecentlyAdded() {
             </div>
 
             {/* Stats and Type */}
-            <div className="flex items-center justify-between mt-3">
+            {/* <div className="flex items-center justify-between mt-3">
               <div className="flex items-center gap-4 text-sm text-gray-500">
                 <div className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
@@ -103,7 +103,7 @@ export default function RecentlyAdded() {
                              bg-[#0066CC]/10 text-[#0066CC]">
                 {item.type}
               </span>
-            </div>
+            </div> */}
           </div>
         ))}
       </div>

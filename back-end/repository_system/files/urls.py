@@ -10,6 +10,7 @@ from .view.PublicFileSearchViewSet import PublicFileSearchViewSet
 from .view.historyViweSet import get_recent_activities
 from .view.RequestFileAccessView import RequestFileAccessView
 from .view.DownloadDocumentView import DownloadDocumentView
+from .view.extract_pdf_text import extract_pdf_text
 
 router = DefaultRouter()
 router.register(r'search', PublicFileSearchViewSet, basename='search')
@@ -27,5 +28,6 @@ urlpatterns = [
     path('activities/recent/', get_recent_activities, name='recent-activities'),
     path('request-access/<uuid:pk>/', RequestFileAccessView.as_view(), name='request-file-access'),
     path("documents/<uuid:doc_id>/download/", DownloadDocumentView.as_view(), name="download_document"),
+    path('getParg/<uuid:pk>/', extract_pdf_text, name='extract_pdf_text'),
     path('', include(router.urls)),
 ]

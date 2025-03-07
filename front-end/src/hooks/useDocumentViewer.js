@@ -123,7 +123,7 @@ export const useDocumentViewer = () => {
   
     try {
       const response = await fetch(`${BackendUrl.file}/request-access/${docId}/`, {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${await tokenManager.getAuthHeaders()}`,

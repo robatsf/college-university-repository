@@ -21,7 +21,7 @@ const DepartmentFileCreate = () => {
   return (
     <Create>
       <SimpleForm onSubmit={handleSubmit} toolbar={<DepartmentFileCreateToolbar />}>
-        <TextInput source="filename" label="File Name" fullWidth validate={[required()]} />
+        <TextInput source="title" label="Title" fullWidth validate={[required()]} />
         <TextInput source="author" label="Author Name" fullWidth validate={[required()]} />
         <TextInput source="department" label="Department" defaultValue="Default Department" fullWidth disabled />
         <TextInput source="description" label="Project/Research Description" multiline fullWidth validate={[required()]} />

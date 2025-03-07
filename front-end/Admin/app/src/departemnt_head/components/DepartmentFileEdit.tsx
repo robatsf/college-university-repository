@@ -32,7 +32,6 @@ const DepartmentFileEdit = (props) => {
   return (
     <Edit {...props}>
       <SimpleForm toolbar={<DepartmentFileCreateToolbar />} onSubmit={handleSubmit}>
-        {/* Removed the ID field from the form */}
         <TextInput source="title" label="Title" fullWidth validate={[required()]} />
         <TextInput source="author" label="Author Name" fullWidth validate={[required()]} />
         {/* <TextInput source="departemnt" label="Department" defaultValue="Default Department" fullWidth disabled /> */}

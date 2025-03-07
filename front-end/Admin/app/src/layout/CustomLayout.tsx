@@ -66,7 +66,7 @@ const roleResources = {
       }}
     />,
   ],
-  departmentHead: [
+  department_head: [
     <Resource
       key="home"
       name="home"

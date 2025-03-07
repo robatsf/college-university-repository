@@ -1,5 +1,4 @@
-import React from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate , Link } from 'react-router-dom';
 import { 
   Building2, 
   Calendar, 
@@ -8,7 +7,8 @@ import {
   Download,
   Files,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Home
 } from 'lucide-react';
 import { useDepartmentFiles } from '../hooks/useDepartmentFiles';
 import Header from '../components/layout/Header';
@@ -70,6 +70,16 @@ export default function DepartmentDetail() {
 
   return (
     <>
+          {/* Home Button */}
+     <Link
+        to="/"
+        className="absolute top-10 left-4 p-2 rounded-full bg-white 
+                   shadow-lg hover:shadow-xl transition-all duration-200 
+                   group hover:scale-105 z-50"
+      >
+        <Home className="h-5 w-5 text-[#0066CC] group-hover:text-[#0052A3]" />
+      </Link>
+
       <Header />
       <div className="container mx-auto px-4 py-8">
         {/* Files Card */}
@@ -77,7 +87,7 @@ export default function DepartmentDetail() {
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-2">
-              <Files className="h-5 w-5 text-[#0066CC]" />
+              <Files className="h-5 w-5 text-[#0066CC]" />  
               <h2 className="text-xl font-semibold text-gray-900">Searched Files</h2>
             </div>
           </div>
@@ -111,7 +121,7 @@ export default function DepartmentDetail() {
                 </div>
 
                 {/* Stats and Type */}
-                <div className="flex items-center justify-between mt-3">
+                {/* <div className="flex items-center justify-between mt-3">
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <div className="flex items-center gap-1">
                       <Eye className="h-4 w-4" />
@@ -126,7 +136,7 @@ export default function DepartmentDetail() {
                                bg-[#0066CC]/10 text-[#0066CC]">
                     {file.type || 'Document'}
                   </span>
-                </div>
+                </div> */}
               </div>
             ))}
 

@@ -158,7 +158,8 @@ class FileSystemViewSet(viewsets.ModelViewSet):
             'departmenthead': 'department_head',
             'teacher': 'teacher',
             'student': 'student',
-            'librarian': 'librarian'
+            'librarian': 'librarian',
+            'guest' : 'guest'
         }
 
         return role_mapping.get(user_type, 'NonUser')
