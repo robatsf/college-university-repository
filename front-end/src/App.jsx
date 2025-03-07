@@ -14,6 +14,7 @@ import FileViewerPage from './pages/ViewFilepage'
 import TermsAndPrivacyPolicy from './pages/TermsAndPrivacyPolicy';
 import TeacherDashboard from './pages/teacherDasbord';
 import HelpPage from './pages/help';
+import Dashboard from './pages/Dashbord';
 
 
 // Auth guard component
@@ -46,10 +47,11 @@ const AppRoutes = () => {
         <Route path="/browsedetail/*" element={<Browserdetails />} />
         <Route path="/TermsAndPrivacyPolicy" element={<TermsAndPrivacyPolicy />} />
         <Route path="/help" element={<HelpPage />} />
-        <Route path='/dashboard'
+        <Route path='/*'
         element={
-          <PrivateRoute allowedRoles={['department_head',"departmenthead", 'librarian',"librarian"]}>
-             <iframe src="/dist/index.html" style={{ width: "100%", height: "100vh", border: "none" }} />
+          <PrivateRoute allowedRoles={['department_head',"departmenthead", 'librarian',"librarian","guest"]}>
+             {/* <iframe src="/dist/index.html" style={{ width: "100%", height: "100vh", border: "none" }} /> */}
+             <Dashboard/>
           </PrivateRoute>
        } />
 
@@ -74,7 +76,7 @@ const AppRoutes = () => {
         <Route
           path="/fileViwe/:id"
           element={
-           <PrivateRoute allowedRoles={['department_head',"teacher", 'librarian',"student"]}>
+           <PrivateRoute allowedRoles={['department_head',"teacher", 'librarian',"student","guest"]}>
               <FileViewerPage />
            </PrivateRoute>
           }

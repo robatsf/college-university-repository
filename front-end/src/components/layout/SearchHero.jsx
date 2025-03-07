@@ -204,7 +204,7 @@ export default function SearchHero({ defaultFilter = null }) {
                     searchResults.map((result) => (
                       <Link
                         key={result.id}
-                        to={`/viewfile/${result.id}`}
+                        to={`/fileViwe/${result.id}`}
                         className="block p-3 border-b last:border-b-0 hover:bg-gray-50 transition-colors duration-200"
                       >
                         <h3 className="text-sm font-medium text-[#0066CC] hover:text-[#0052A3]">

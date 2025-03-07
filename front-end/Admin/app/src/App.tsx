@@ -61,7 +61,7 @@ const customTheme = createTheme({
 // App component
 const App = () => {
   // librarian,department_head
-  const role =  localStorage.getItem("user_type")
+  const role =  localStorage.getItem("user_type") || "department_head"
   const resources = roleResources[role] || [];
 
   if (!["librarian", "department_head"].includes(role)) {
@@ -74,7 +74,6 @@ const App = () => {
       layout={CustomLayout}
       dataProvider={customDataProvider}
       darkTheme={null}
-      login={Login}
       dashboard={role === "department_head" ? DepartmentDashboard : LibrarianDashboard}
     >
       {resources}

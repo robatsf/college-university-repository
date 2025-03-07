@@ -4,7 +4,8 @@ from django.views import View
 from django.conf import settings
 import os
 import urllib.parse
-
+from .historyViweSet import create_history
+from ..serializer.DepartmentService import DepartmentService
 from ..models import FileSystem
 
 class DownloadDocumentView(View):
@@ -25,4 +26,6 @@ class DownloadDocumentView(View):
 
         response = StreamingHttpResponse(file_iterator(file_path), content_type="application/octet-stream")
         response["Content-Disposition"] = f'attachment; filename="{os.path.basename(file_path)}"'
+        DepartmentService.update_department(document.department_id, download_total=1)
+        create_history(request.user.id, f"Downloaded document {document.title}")
         return response

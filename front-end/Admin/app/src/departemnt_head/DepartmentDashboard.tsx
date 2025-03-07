@@ -19,9 +19,17 @@ interface ChartDataItem {
   value: number;
 }
 
+interface tokenData {
+  user_id: string,
+  user_name : string,
+  department : string,
+  department_id : string,
+  email : string,
+  image_path : string,
+  user_type: string,
+}
+
 const DepartmentDashboard = () => {
-  const role = "departmentHead";
-  const name = localStorage.getItem("name") || "Department Head";
 
   // State for department data
   const [department, setDepartment] = useState(null);
@@ -32,6 +40,7 @@ const DepartmentDashboard = () => {
     { name: "Total Downloads", value: 0 },
   ]);
   const [statistics, setstatistics] = useState(0)
+    const [tokenData , settokenData] = useState<tokenData[]>([])
 
   useEffect(() => {
     const fetchDepartmentData = async () => {
@@ -53,7 +62,13 @@ const DepartmentDashboard = () => {
       }
     };
 
+    const gettoken = async () => {
+      const value   = await getTokenData();
+      settokenData(value)
+    };
+
     fetchDepartmentData();
+    gettoken();
   }, []);
 
   // Calculate the trend based on the time since creation
@@ -84,7 +99,7 @@ const DepartmentDashboard = () => {
 
   return (
     <Box p={3}>
-      <WelcomeCard role={role} name={name} />
+      <WelcomeCard role={tokenData.user_type} name={tokenData.user_name} image_path={tokenData.image_path} />
 
       <Grid container spacing={3}>
         {department ? (

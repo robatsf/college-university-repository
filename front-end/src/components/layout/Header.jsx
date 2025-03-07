@@ -10,11 +10,13 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { getTokenData, removeToken } from '../../hooks/auth/token';
 import BackendUrl from '../../hooks/config';
+import PasswordChangeModal from '../modals/passwordChangeModal';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [user, setUser] = useState(null);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +36,15 @@ export default function Header() {
     removeToken();
     setUser(null);
     handleMenuClose();
+  };
+
+  const handleOpenPasswordModal = () => {
+    handleMenuClose();
+    setPasswordModalOpen(true);
+  };
+
+  const handleClosePasswordModal = () => {
+    setPasswordModalOpen(false);
   };
 
   const navItems = !user ? [{ name: 'Sign In', path: '/login' }] : [];
@@ -92,7 +103,7 @@ export default function Header() {
                 </ListItemIcon>
                 <ListItemText>{user.email}</ListItemText>
               </MenuItem>
-              <MenuItem component={Link} to="/change-password" onClick={handleMenuClose}>
+              <MenuItem onClick={handleOpenPasswordModal}>
                 <ListItemIcon>
                   <Key className="h-4 w-4" />
                 </ListItemIcon>
@@ -179,69 +190,77 @@ export default function Header() {
   };
 
   return (
-    <nav className="bg-[#0066CC] text-white shadow-md transition-all duration-200">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-14">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Link 
-              to="/" 
-              className="flex items-center space-x-2 hover:opacity-90 transition-opacity duration-200"
-            >
-              <BookOpen className="h-6 w-6" />
-              <span className="font-bold text-lg">HUDC IRS</span>
-            </Link>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-2">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className="px-3 py-1.5 rounded-md hover:bg-[#0052A3] transition-colors duration-200 text-sm"
+    <>
+      <nav className="bg-[#0066CC] text-white shadow-md transition-all duration-200">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex justify-between items-center h-14">
+            {/* Logo */}
+            <div className="flex items-center">
+              <Link 
+                to="/" 
+                className="flex items-center space-x-2 hover:opacity-90 transition-opacity duration-200"
               >
-                {item.name}
+                <BookOpen className="h-6 w-6" />
+                <span className="font-bold text-lg">HUDC IRS</span>
               </Link>
-            ))}
-            {renderUserAvatar()}
-          </div>
+            </div>
 
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            className="md:hidden text-white hover:bg-[#0052A3] transition-colors duration-200 p-1"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <MenuIcon className="h-5 w-5" />
-            )}
-          </Button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden animate-slideDown">
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-[#0066CC] border-t border-[#0052A3]">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className="block px-3 py-2 rounded-md hover:bg-[#0052A3] transition-colors duration-200 text-sm"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
-            <div className="px-3 py-2">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className="px-3 py-1.5 rounded-md hover:bg-[#0052A3] transition-colors duration-200 text-sm"
+                >
+                  {item.name}
+                </Link>
+              ))}
               {renderUserAvatar()}
             </div>
+
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              className="md:hidden text-white hover:bg-[#0052A3] transition-colors duration-200 p-1"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <MenuIcon className="h-5 w-5" />
+              )}
+            </Button>
           </div>
         </div>
-      )}
-    </nav>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden animate-slideDown">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-[#0066CC] border-t border-[#0052A3]">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className="block px-3 py-2 rounded-md hover:bg-[#0052A3] transition-colors duration-200 text-sm"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              ))}
+              <div className="px-3 py-2">
+                {renderUserAvatar()}
+              </div>
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* Password Change Modal */}
+      <PasswordChangeModal 
+        open={passwordModalOpen} 
+        onClose={handleClosePasswordModal} 
+      />
+    </>
   );
 }

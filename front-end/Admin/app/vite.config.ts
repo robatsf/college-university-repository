@@ -40,8 +40,19 @@ export default defineConfig(({ mode }) => ({
     host: true,
   },
   build: {
-    sourcemap: mode === "developement",
+    chunkSizeWarningLimit: 1000,
+    sourcemap: mode === "production",
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            return "vendor"; // Moves all dependencies to a separate chunk
+          }
+        },
+      },
+    },
   },
+  
   resolve: { alias },
   base: "./",
 }));

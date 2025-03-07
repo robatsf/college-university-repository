@@ -5,7 +5,6 @@ from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from django_filters import rest_framework as django_filters
 from rest_framework.pagination import PageNumberPagination
 
@@ -126,11 +125,6 @@ class PublicFileSearchViewSet(viewsets.ReadOnlyModelViewSet):
         similar_queries = []
         
         if query:
-            SearchManager.record_search(
-                query=query,
-                ip_address=self.get_client_ip(request)
-            )
-            
             similar_queries = SearchManager.get_similar_searches(query)
             queryset = self.get_search_results(query, queryset)
             
@@ -175,6 +169,13 @@ class PublicFileSearchViewSet(viewsets.ReadOnlyModelViewSet):
             data = self.serialize_data(serializer.data)
             for item in data:
                 item['department'] = queryset.get(id=item['id']).department.name
+
+            if len(data) > 0 :
+                SearchManager.record_search(
+                    query=query,
+                    ip_address=self.get_client_ip(request)
+                )
+            
             return self.get_paginated_response({
                 'results': data,
                 'search_context': context
@@ -184,6 +185,13 @@ class PublicFileSearchViewSet(viewsets.ReadOnlyModelViewSet):
         data = self.serialize_data(serializer.data)
         for item in data:
             item['department'] = queryset.get(id=item['id']).department.name
+        
+        if data['results'] is not  [] :
+            SearchManager.record_search(
+                query=query,
+                ip_address=self.get_client_ip(request)
+            )
+        
         return Response({
             'results': data,
             'search_context': context

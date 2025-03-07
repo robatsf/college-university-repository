@@ -39,7 +39,7 @@ class FileViewByIdView(APIView):
                 "file_extension": file_instance.file_extension,
                 "size": file_instance.file_size,
                 "category": file_instance.department.name,
-                "accessLevel": request.user.role != 'guest',
+                "accessLevel": request.user.role == 'guest',
                 "asked_request": user_requested
             }
 

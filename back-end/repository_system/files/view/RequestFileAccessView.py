@@ -6,7 +6,7 @@ from ..models import FileSystem, Request
 import uuid
 
 class RequestFileAccessView(APIView):
-    def post(self, request, pk, *args, **kwargs):
+    def get(self, request, pk, *args, **kwargs):
         """Handles file access request submission."""
         user_id = request.user.id 
 

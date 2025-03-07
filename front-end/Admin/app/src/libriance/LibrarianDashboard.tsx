@@ -9,6 +9,7 @@ import { apibase } from "../dataProvider";
 import StatCard from "../components/StatCard";
 import WelcomeCard from "../components/WelcomeCard";
 import { tokenManager } from "../utils/tokenManager";
+import {getTokenData} from  "../utils/token"
 
 // Types
 interface Department {
@@ -20,6 +21,17 @@ interface Department {
   unapproved_files: number;
   created_at: string;
   updated_time: string;
+}
+
+
+interface tokenData {
+  user_id: string,
+  user_name : string,
+  department : string,
+  department_id : string,
+  email : string,
+  image_path : string,
+  user_type: string,
 }
 
 interface DepartmentStats {
@@ -74,8 +86,6 @@ export const StyledCardHeader = styled(CardHeader)(({ theme }) => ({
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 const LibrarianDashboard = () => {
-  const role = "librarian";
-  const name = localStorage.getItem("name") || "Librarian";
 
   const [departments, setDepartments] = useState<Department[]>([]);
   const [stats, setStats] = useState<DepartmentStats>({
@@ -85,6 +95,7 @@ const LibrarianDashboard = () => {
     total_history: 0,
     total_unapproved: 0,
   });
+  const [tokenData , settokenData] = useState<tokenData[]>([])
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -113,7 +124,13 @@ const LibrarianDashboard = () => {
       }
     };
 
+    const gettoken = async () => {
+      const value   = await getTokenData();
+      settokenData(value)
+    };
+
     fetchDepartments();
+    gettoken();
   }, []);
 
   const chartData = departments.map(dept => ({
@@ -125,7 +142,7 @@ const LibrarianDashboard = () => {
 
   return (
     <Box p={3}>
-      <WelcomeCard role={role} name={name} />
+      <WelcomeCard role={tokenData.user_type} name={tokenData.user_name} image_path={tokenData.image_path}/>
 
       <Grid container spacing={4}>
         {/* Statistics Cards */}
@@ -182,9 +199,6 @@ const LibrarianDashboard = () => {
                 </Box>
                 
                 <Box flex={1} height={400}>
-                  <Typography variant="h6" gutterBottom>
-                    Department Activity Distribution
-                  </Typography>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
