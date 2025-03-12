@@ -13,6 +13,7 @@ def approve_file(request, pk):
         if  statu == 'approved':
             file.approved = 'approved'
             file.disapproval_reason = None
+            file.availability = True
         else:
             if not reason:
                 return Response(

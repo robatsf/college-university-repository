@@ -215,3 +215,11 @@ X_FRAME_OPTIONS = 'ALLOWALL'
 CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000"]
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = None
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
