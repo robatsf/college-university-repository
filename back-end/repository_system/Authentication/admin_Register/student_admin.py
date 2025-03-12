@@ -4,12 +4,16 @@ from django.urls import path, reverse
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import redirect
 from django import forms
+import logging
 from ..models import Student
 from files.models import DepartmentList
 from ..service.services import UserUtils, EmailService
+from .excel_import import ExcelImportMixin
+
+logger = logging.getLogger(__name__)
 
 @admin.register(Student)
-class StudentAdmin(admin.ModelAdmin):
+class StudentAdmin(admin.ModelAdmin, ExcelImportMixin):
     list_display = ('first_name', 'middle_name', 'last_name', 'profile_image_preview', 'email', 
                    'institutional_email', 'status_indicator', 'toggle_activation_button')
     search_fields = ('first_name', 'last_name')
@@ -30,6 +34,7 @@ class StudentAdmin(admin.ModelAdmin):
         css = {
             'all': ('admin/css/student_admin.css',)
         }
+        js = ('admin/js/student_admin.js',)
     
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         """
@@ -88,8 +93,10 @@ class StudentAdmin(admin.ModelAdmin):
                 self.toggle_activation,
                 name='toggle_student_activation'
             ),
+            # Excel import URLs are now handled by the ExcelImportMixin
         ]
-        return custom_urls + urls
+        # Combine with Excel import URLs from the mixin
+        return self.get_excel_import_urls() + custom_urls + urls
     
     def toggle_activation(self, request, student_id):
         student = Student.objects.get(id=student_id)
@@ -101,7 +108,20 @@ class StudentAdmin(admin.ModelAdmin):
             f"Student {student.first_name} has been {status_msg}.",
             messages.SUCCESS
         )
-        return redirect(request.META.get('HTTP_REFERER', 'admin:users_student_changelist'))
+        return redirect(request.META.get('HTTP_REFERER', 'admin:Authentication_student_changelist'))
+    
+    def changelist_view(self, request, extra_context=None):
+        """
+        Override changelist_view to add the import URL to the context
+        """
+        # Get the original response
+        response = super().changelist_view(request, extra_context)
+        
+        # Add the import URL to the messages for the JavaScript to pick up
+        if hasattr(response, 'context_data'):
+            messages.info(request, 'EXCEL_IMPORT_URL:' + reverse('admin:import_excel'))
+        
+        return response
     
     def save_model(self, request, obj, form, change):
         is_new = not change 

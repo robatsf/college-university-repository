@@ -14,6 +14,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+import {getTokenData} from "../utils/token"
+
 interface ChartDataItem {
   name: string;
   value: number;
