@@ -7,6 +7,9 @@ import  customDataProvider  from './dataProvider';
 import LibrarianDashboard from './libriance/LibrarianDashboard';
 import DepartmentDashboard from './departemnt_head/DepartmentDashboard';
 
+export const  localhost = (value)=>{
+  window.location = "http://localhost:5173" + value; 
+}
 // Custom AppBar component that extends react-admin's AppBar
 const CustomAppBar = (props: AppBarProps) => (
   <RaAppBar {...props}>
@@ -65,7 +68,7 @@ const App = () => {
   const resources = roleResources[role] || [];
 
   if (!["librarian", "department_head"].includes(role)) {
-    window.location.href = "/login";
+   localhost("/login")
   }
 
   return (

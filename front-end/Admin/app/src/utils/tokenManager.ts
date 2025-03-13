@@ -1,6 +1,7 @@
 // src/utils/tokenManager.ts
 import {jwtDecode} from 'jwt-decode';
 import { apibase } from '../dataProvider';
+import { localhost } from '../App';
 
 interface JWTPayload {
   exp: number;
@@ -115,7 +116,7 @@ class TokenManager {
 
   private redirectToLogin() {
     setTimeout(() => {
-      window.location.href = '/login';
+    localhost('/login');
     }, 5000);
   }
 

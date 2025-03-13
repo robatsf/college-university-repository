@@ -50,8 +50,8 @@ const AppRoutes = () => {
         <Route path='/*'
         element={
           <PrivateRoute allowedRoles={['department_head',"departmenthead", 'librarian',"librarian","guest"]}>
-             <iframe src="/dist/index.html" style={{ width: "100%", height: "100vh", border: "none" }} />
-             {/* <Dashboard/> */}
+             {/* <iframe src="/dist/index.html" style={{ width: "100%", height: "100vh", border: "none" }} /> */}
+             <Dashboard/>
           </PrivateRoute>
        } />
 
