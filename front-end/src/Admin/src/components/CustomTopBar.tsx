@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { LogoutDialog } from './LogoutDialog';
 import { useSidebarState } from 'react-admin';
+import { localhost } from '../App';
 
 export const CustomTopBar = ({ role }) => {
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
@@ -20,7 +21,7 @@ export const CustomTopBar = ({ role }) => {
 
   const handleLogout = () => {
     localStorage.clear()
-    window.location.href = '/login';
+    localhost("/login")
   };
 
   return (

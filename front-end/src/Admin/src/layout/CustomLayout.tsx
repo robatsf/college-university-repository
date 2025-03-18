@@ -30,9 +30,10 @@ import { LibrarianCreate } from "../libriance/components/LibrarianCreate";
 import { LibrarianEdit } from "../libriance/components/LibrarianEdit";
 import librarianFileShow from "../libriance/components/Librarianshow";
 import { Home } from "lucide-react";
+import { localhost } from "../App";
 
 const RedirectResource = () => {
-  window.location = "/"
+  localhost("/login")
 };
 
 const roleResources = {
