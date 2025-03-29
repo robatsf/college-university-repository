@@ -50,7 +50,7 @@ const AppRoutes = () => {
 
 
         {/* Protected Routes */}
-        <Route path='/dashboard'
+        <Route path='/dashboard/*'
         element={
           <PrivateRoute allowedRoles={['department_head', 'librarian',"guest"]}>
             <Dashboard/>

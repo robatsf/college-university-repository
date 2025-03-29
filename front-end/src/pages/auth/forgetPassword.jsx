@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
@@ -19,16 +20,16 @@ export default function ForgotPassword() {
 
   if (isEmailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-        <div className="w-full max-w-md bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg text-center">
           <div className="mb-6">
             <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
               <Check className="h-6 w-6 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Check your email
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-600">
               We've sent password reset instructions to your email address.
             </p>
           </div>
@@ -54,11 +55,11 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-[#0066CC]">Forgot Password?</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-600 mt-1">
             No worries, we'll send you reset instructions.
           </p>
         </div>
@@ -70,7 +71,7 @@ export default function ForgotPassword() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm text-gray-700 dark:text-gray-300">
+                  <FormLabel className="text-sm text-gray-700">
                     Email Address
                   </FormLabel>
                   <FormControl>
@@ -79,7 +80,7 @@ export default function ForgotPassword() {
                       <Input
                         {...field}
                         placeholder="name@example.com"
-                        className={`pl-9 h-10 text-sm border-gray-200 dark:border-gray-700 focus:border-[#0066CC] focus:ring-[#0066CC]/20 dark:bg-gray-800 dark:text-white
+                        className={`pl-9 h-10 text-sm border-gray-200 focus:border-[#0066CC] focus:ring-[#0066CC]/20
                                    ${form.formState.errors.email ? 
                                      'border-red-500 focus:border-red-500' : 
                                      field.value && !form.formState.errors.email ?
@@ -123,7 +124,7 @@ export default function ForgotPassword() {
                 type="button"
                 variant="ghost"
                 onClick={() => navigate('/login')}
-                className="w-full h-10 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 transition-colors duration-200"
+                className="w-full h-10 text-sm text-gray-600 hover:text-white hover:bg-[#0066CC] transition-colors duration-200"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Login
@@ -133,7 +134,7 @@ export default function ForgotPassword() {
         </Form>
 
         {/* Remember Password Link */}
-        <div className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">
+        <div className="text-xs text-center text-gray-500 mt-4">
           Remember your password?{' '}
           <Link
             to="/login"

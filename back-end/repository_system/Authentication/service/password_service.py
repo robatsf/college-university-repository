@@ -13,7 +13,7 @@ class PasswordService:
     def reset_password(email: str) -> dict:
         """Reset user password and send temporary password via email"""
         try:
-            user, user_type = JWTService.Verify_user_by_email(email)
+            user, user_type = JWTService.verify_user_by_email(email)
             temp_password = UserUtils.generate_password()
             user.password = make_password(temp_password)
             if hasattr(user, 'ask_for_forget_password'):
