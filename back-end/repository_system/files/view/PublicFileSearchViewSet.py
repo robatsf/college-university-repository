@@ -170,7 +170,7 @@ class PublicFileSearchViewSet(viewsets.ReadOnlyModelViewSet):
             for item in data:
                 item['department'] = queryset.get(id=item['id']).department.name
 
-            if len(data) > 0 and  query:
+            if len(data) > 0 and  query and not query == '@':
                 SearchManager.record_search(
                     query=query,
                     ip_address=self.get_client_ip(request)

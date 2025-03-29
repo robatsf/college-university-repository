@@ -46,7 +46,6 @@ const customTheme = createTheme({
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState("");
-
   useEffect(() => {
     setTimeout(() => { 
       const userType = localStorage.getItem("user_type") || "department_head";
@@ -76,6 +75,7 @@ const Dashboard = () => {
       layout={CustomLayout}
       dataProvider={customDataProvider}
       darkTheme={null}
+      basename='/dashboard'
       dashboard={role === "department_head" ? DepartmentDashboard : LibrarianDashboard}
     >
       {resources}

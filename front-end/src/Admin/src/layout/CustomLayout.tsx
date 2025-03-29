@@ -33,7 +33,7 @@ import { Home } from "lucide-react";
 import { localhost } from "../App";
 
 const RedirectResource = () => {
-  localhost("/login")
+  localhost("/")
 };
 
 const roleResources = {
