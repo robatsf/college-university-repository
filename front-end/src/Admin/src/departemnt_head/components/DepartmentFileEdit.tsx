@@ -23,7 +23,7 @@ const DepartmentFileEdit = (props) => {
         data,
       });
       notify("Department file updated successfully", { type: "success" });
-      redirect("/department_files");
+      redirect("/dashboard/department_files");
     } catch (error) {
       notify(`Error: ${error.message}`, { type: "error" });
     }

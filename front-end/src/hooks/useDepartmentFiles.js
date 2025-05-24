@@ -23,7 +23,8 @@ export function useDepartmentFiles() {
   // Extract search parameters outside of the fetch function
   const page = searchParams.get('page') || 1;
   const searchQuery = searchParams.get('q');
-  const departmentName = searchParams.get('department');
+  // Get department from the 'departemnt' parameter (note the typo in the URL)
+  const departmentName = searchParams.get('departemnt');
   
   const fetchFiles = useCallback(async () => {
     const currentSearchParams = searchParams.toString();
@@ -98,7 +99,7 @@ export function useDepartmentFiles() {
     error, 
     pagination, 
     setSearchParams,
-    currentDepartment: searchParams.get('department') || '',
+    currentDepartment: departmentName || '',
     searchQuery: searchParams.get('q') || ''
   };
 }

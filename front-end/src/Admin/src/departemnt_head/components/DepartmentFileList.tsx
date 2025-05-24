@@ -11,14 +11,13 @@ import {
 import { Tooltip, Typography } from "@mui/material";
 import DepartmentFileFilter from "./DepartmentFileFilter";
 
-// Custom Description Field Component
 const TruncatedDescriptionField = () => {
   const record = useRecordContext();
   if (!record) return null;
 
   const description = record.description || '';
   const truncatedText = description.length > 10 
-    ? `${description.substring(0, 10)}...` 
+    ? `${description.substring(0, 15)}...` 
     : description;
   
   return (

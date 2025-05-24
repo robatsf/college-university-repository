@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from ..serializer.FileSystemSerializer import FileSystemSerializer
 from .FileSystemViews import FileSystemViewSet
-from ..permissions import DynamicPermission
+from ..models import DepartmentList
 
 class FileListView(APIView):
     """
@@ -22,10 +22,23 @@ class FileListView(APIView):
         viewset.request = request
         queryset = viewset.get_queryset()
         serializer = FileSystemSerializer(queryset, many=True)
-        total_count = queryset.count()  # Get the total number of records
+        total_count = queryset.count()
 
-        response = Response(serializer.data, status=status.HTTP_200_OK)
-        response["Content-Range"] = f"files 0-{len(serializer.data)}/{total_count}"  # Add Content-Range header
+        data = serializer.data
+        for item in data:
+            if 'department' in item and item['department']:
+                try:
+                    department = DepartmentList.objects.get(id=item['department'])
+                    item['department'] = department.name
+                except DepartmentList.DoesNotExist:
+                    pass
+            
+            if 'department_name' in item:
+                item['department'] = item['department_name']
+                del item['department_name']
+
+        response = Response(data, status=status.HTTP_200_OK)
+        response["Content-Range"] = f"files 0-{len(data)}/{total_count}"  # Add Content-Range header
         return response
 
 

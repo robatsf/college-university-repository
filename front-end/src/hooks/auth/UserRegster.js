@@ -77,7 +77,9 @@ export const useRegisterForm = () => {
       const response = await api.request('users/register-guest/', {
         method: 'POST',
         data: formData,
-        form: form, // Pass form instance for automatic error handling
+        form: form,
+        redirectOnSuccess: '/login', // Redirect to verification page on success
+        redirectDelay: 2500, // Optional: delay in milliseconds before redirect
         toaster: {
           onSuccess: (message) => {
             toast.success(message || 'Registration successful! Verifcation Email sent');
