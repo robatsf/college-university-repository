@@ -62,7 +62,7 @@ export const UpdateDepartemntPassword = () => {
       
       await customDataProvider.create("change-password", { data: transformedData });
       notify("Password updated successfully", { type: "success" });
-      redirect("/");
+      redirect("/dashboard");
     } catch (error) {
       console.error("Password update error:", error);
       

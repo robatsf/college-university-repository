@@ -2,9 +2,11 @@ from rest_framework import generics, status
 from ..models import Guest
 from ..serializer.guest_serializer import  GuestRegistrationSerializer
 from ..Reuse.ResponseStructure import  ResponseStructure
+from rest_framework.permissions import AllowAny
 
 
 class GuestRegistrationView(generics.CreateAPIView):
+    permission_classes = [AllowAny]
     queryset = Guest.objects.all()
     serializer_class = GuestRegistrationSerializer
 
@@ -20,8 +22,7 @@ class GuestRegistrationView(generics.CreateAPIView):
         try:
             result = serializer.save()
             return ResponseStructure.success(
-                # data=result.get('data'),
-                message=result.get('message', "Registration successful. Please check your email for verification."),
+                message="Registration successful. Please check your email for verification.",
                 status_code=status.HTTP_201_CREATED
             )
         except Exception as e:

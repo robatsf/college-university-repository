@@ -56,8 +56,8 @@ const ViewFilePage = () => {
                     </div>
                   </div>
                 ) : (
-                  <div>
-                    <CustomPdfViewer
+                  <div className='h-full'>
+                    <CustomPdfViewer 
                       encryptedUrl={btoa(fileData.url)}
                     />
                   </div>
@@ -68,50 +68,42 @@ const ViewFilePage = () => {
         </div>
         {/* <Agentview  id={fileData?.id}/> */}
 
-        {/* Desktop Sidebar (always visible on md and larger screens) */}
-        <div className="hidden md:block">
-          <DocumentSidebar
-            fileData={fileData}
-            isSidebarOpen={isDesktop ? true : isSidebarOpen}
-            setIsSidebarOpen={setIsSidebarOpen}
-            isViewOnly={fileData?.accessLevel}
-            onDownload={handleDownload}
-            onRequestAccess={handleRequestAccess}
-          />
-        </div>
       </div>
 
-      {/* Mobile Sidebar Overlay */}
+      {/* Unified Sidebar Overlay for both Mobile and Desktop */}
       {isSidebarOpen && (
-        <div className="md:hidden fixed inset-0 z-30 flex">
-          {/* Semi-transparent overlay */}
+        <div className="fixed inset-0 z-30 flex">
+          {/* Semi-transparent overlay (only visible on mobile) */}
           <div
-            className="fixed inset-0 bg-black opacity-50"
+            className={`fixed inset-0 bg-black ${isDesktop ? 'opacity-0 pointer-events-none' : 'opacity-50'} transition-opacity duration-300`}
             onClick={() => setIsSidebarOpen(false)}
           ></div>
+          
           {/* Sidebar sliding in from the right */}
-          <div className="relative ml-auto w-80 bg-white shadow-lg">
-          <DocumentSidebar
-            fileData={fileData}
-            isSidebarOpen={isDesktop ? true : isSidebarOpen}
-            setIsSidebarOpen={setIsSidebarOpen}
-            isViewOnly={fileData?.accessLevel}
-            onDownload={handleDownload}
-            onRequestAccess={handleRequestAccess}
-          />
+          <div className={`relative ml-auto w-80 bg-white shadow-lg ${isDesktop ? 'md:shadow-none' : ''}`}>
+            <DocumentSidebar
+              fileData={fileData}
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
+              isViewOnly={fileData?.accessLevel}
+              onDownload={handleDownload}
+              onRequestAccess={handleRequestAccess}
+            />
           </div>
         </div>
       )}
 
-      {/* Mobile Toggle Button */}
-      <div className="md:hidden fixed bottom-4 right-4 z-40">
-        <button
-          onClick={() => setIsSidebarOpen((prev) => !prev)}
-          className="bg-blue-500 text-white p-3 rounded-full shadow-lg focus:outline-none"
-        >
-          <FaBars size={24} />
-        </button>
-      </div>
+      {/* Toggle Button (only visible when sidebar is closed) */}
+      {!isSidebarOpen && (
+        <div className="fixed bottom-4 right-4 z-40">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="bg-blue-500 text-white p-3 rounded-full shadow-lg focus:outline-none hover:bg-blue-600 transition-colors duration-200"
+          >
+            <FaBars size={24} />
+          </button>
+        </div>
+      )}
     </div>
     </>
   );

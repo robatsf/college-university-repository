@@ -89,6 +89,7 @@ class FileSystemViewSet(viewsets.ModelViewSet):
                 file_size=file_size,
                 file_extension=file_extension,
                 original_file_path="files"+file_path,
+                availability=True
             )
             create_history(self.request.user.id,"Added a file : " + self.request.POST.get('title') or "One file")
         except ValidationError as e:
@@ -140,7 +141,7 @@ class FileSystemViewSet(viewsets.ModelViewSet):
         """
         Deletes a file. Only the admin or the original uploader can delete it.
         """
-        if self.request.user.role != 'admin' and instance.uploaded_by_id != self.request.user.id:
+        if  self.request.user.role != 'department_head' and instance.uploaded_by_id != self.request.user.id:
             raise PermissionDenied("You do not have permission to delete this file.")
         
         create_history(self.request.user.id,"Deleted a file : One file")

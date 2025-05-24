@@ -107,6 +107,13 @@ export class ApiHandler {
     if (options?.toaster?.onError) {
       options.toaster.onError(errorMessage);
     }
+    
+    // Handle redirect on error if specified
+    if (options?.redirectOnError) {
+      if (typeof window !== 'undefined') {
+        window.location.href = options.redirectOnError;
+      }
+    }
   
     if (this.config.isDevelopment) {
       console.error('API Error:', error);
@@ -155,14 +162,23 @@ export class ApiHandler {
     if (!response) return null;
 
     const successData = {
-      data:response.data || null,
+      data: response.data || null,
       message: response.data.message || 'Success',
-      main : response,
-      status : true
+      main: response,
+      status: true
     };
   
     if (options?.toaster?.onSuccess) {
       options.toaster.onSuccess(successData.message);
+    }
+    
+    // Handle redirect on success if specified
+    if (options?.redirectOnSuccess) {
+      if (typeof window !== 'undefined') {
+        setTimeout(() => {
+          window.location.href = options.redirectOnSuccess;
+        }, options.redirectDelay || 0);
+      }
     }
   
     return successData.data;
@@ -199,9 +215,25 @@ export const useApiRequest = (api, endpoint, options = {}) => {
       if (options.toaster?.onSuccess) {
         options.toaster.onSuccess(response.data?.message || 'Success');
       }
+      
+      // Handle redirect on success if specified
+      if (options?.redirectOnSuccess) {
+        if (typeof window !== 'undefined') {
+          setTimeout(() => {
+            window.location.href = options.redirectOnSuccess;
+          }, options.redirectDelay || 0);
+        }
+      }
     } catch (error) {
       const errorMessage = api.handleError(error, options);
       setError(errorMessage);
+      
+      // Handle redirect on error if specified
+      if (options?.redirectOnError) {
+        if (typeof window !== 'undefined') {
+          window.location.href = options.redirectOnError;
+        }
+      }
     } finally {
       setIsLoading(false);
     }

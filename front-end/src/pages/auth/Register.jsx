@@ -37,12 +37,12 @@ export default function Register() {
   } = useRegisterForm();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
 
       {/* Home Button */}
     <Link
       to="/"
-      className="absolute top-4 left-4 p-2 rounded-full bg-white dark:bg-gray-800 
+      className="absolute top-4 left-4 p-2 rounded-full bg-white 
                  shadow-lg hover:shadow-xl transition-all duration-200 
                  group hover:scale-105 z-50"
     >
@@ -50,12 +50,12 @@ export default function Register() {
     </Link>
 
     
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+      <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-[#0066CC]">
             Create Account
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-600 mt-1">
             Join our community today
           </p>
         </div>
@@ -68,7 +68,7 @@ export default function Register() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm text-gray-700 dark:text-gray-300">
+                  <FormLabel className="text-sm text-gray-700">
                     Username
                   </FormLabel>
                   <FormControl>
@@ -82,8 +82,8 @@ export default function Register() {
                             'border-red-500 focus:border-red-500' : 
                             field.value && !form.formState.errors.username ?
                             'border-green-500 focus:border-green-500' :
-                            'border-gray-200 dark:border-gray-700'}
-                          focus:ring-[#0066CC]/20 dark:bg-gray-800 dark:text-white`}
+                            'border-gray-200'}
+                          focus:ring-[#0066CC]/20`}
                       />
                       {watchUsername && (
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -106,7 +106,7 @@ export default function Register() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm text-gray-700 dark:text-gray-300">
+                  <FormLabel className="text-sm text-gray-700">
                     Email
                   </FormLabel>
                   <FormControl>
@@ -120,8 +120,8 @@ export default function Register() {
                             'border-red-500 focus:border-red-500' : 
                             field.value && !form.formState.errors.email ?
                             'border-green-500 focus:border-green-500' :
-                            'border-gray-200 dark:border-gray-700'}
-                          focus:ring-[#0066CC]/20 dark:bg-gray-800 dark:text-white`}
+                            'border-gray-200'}
+                          focus:ring-[#0066CC]/20`}
                       />
                       {watchEmail && (
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -144,7 +144,7 @@ export default function Register() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm text-gray-700 dark:text-gray-300">
+                  <FormLabel className="text-sm text-gray-700">
                     Password
                   </FormLabel>
                   <FormControl>
@@ -159,8 +159,8 @@ export default function Register() {
                             'border-red-500 focus:border-red-500' : 
                             field.value && !form.formState.errors.password ?
                             'border-green-500 focus:border-green-500' :
-                            'border-gray-200 dark:border-gray-700'}
-                          focus:ring-[#0066CC]/20 dark:bg-gray-800 dark:text-white`}
+                            'border-gray-200'}
+                          focus:ring-[#0066CC]/20`}
                       />
                       <button
                         type="button"
@@ -222,7 +222,7 @@ export default function Register() {
               name="confirm_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm text-gray-700 dark:text-gray-300">
+                  <FormLabel className="text-sm text-gray-700">
                     Confirm Password
                   </FormLabel>
                   <FormControl>
@@ -237,8 +237,8 @@ export default function Register() {
                             'border-red-500 focus:border-red-500' : 
                             watchConfirmPassword && watchPassword === watchConfirmPassword ?
                             'border-green-500 focus:border-green-500' :
-                            'border-gray-200 dark:border-gray-700'}
-                          focus:ring-[#0066CC]/20 dark:bg-gray-800 dark:text-white`}
+                            'border-gray-200'}
+                          focus:ring-[#0066CC]/20`}
                       />
                       <button
                         type="button"
@@ -277,7 +277,7 @@ export default function Register() {
                 )}
               </Button>
 
-              <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-center text-sm text-gray-600">
                 Already have an account?{' '}
                 <Link 
                   to="/login"
@@ -291,7 +291,7 @@ export default function Register() {
           </form>
         </Form>
 
-        <div className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">
+        <div className="text-xs text-center text-gray-500 mt-4">
           By creating an account, you agree to our{' '}
           <Link to="/TermsAndPrivacyPolicy" className="text-[#0066CC] hover:text-[#0052A3]">Terms</Link>{' '}
           and{' '}

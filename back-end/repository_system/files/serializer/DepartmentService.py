@@ -16,12 +16,10 @@ class DepartmentService:
             dept = DepartmentList.objects.get(id=department_id)
         except DepartmentList.DoesNotExist:
             raise ValueError("Department not found")
-
-        # Loop through the provided updates
+        
         for field, value in updates.items():
             if hasattr(dept, field):
                 current_value = getattr(dept, field)
-                # If both the current value and the update are numbers, add them
                 if isinstance(current_value, (int, float)) and isinstance(value, (int, float)):
                     new_value = current_value + value
                 else:

@@ -12,7 +12,7 @@ export const LibrarianCreate = () => {
     try {
       await customDataProvider.createfile("/create/", { data });
       notify("Librarian file created successfully", { type: "success" });
-      redirect("/libapprovals");
+      redirect("/dashboard/libapprovals");
     } catch (error) {
       notify(`Error: ${error.message}`, { type: "error" });
     }

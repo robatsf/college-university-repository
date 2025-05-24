@@ -2,9 +2,11 @@ from rest_framework import generics
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from ..models import Guest
+from rest_framework.permissions import AllowAny
 
 
 class VerifyGuestView(generics.GenericAPIView):
+    permission_classes=[AllowAny]
     def get(self, request, token, *args, **kwargs):
         try:
             guest = get_object_or_404(Guest, email_verification_token=token)
