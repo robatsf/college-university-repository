@@ -75,7 +75,7 @@ const AppRoutes = () => {
         <Route
           path="/fileViwe/:id"
           element={
-           <PrivateRoute allowedRoles={['department_head',"teacher", 'librarian',"student"]}>
+           <PrivateRoute allowedRoles={['department_head',"teacher", 'librarian',"student","guest" ,"Guest"]}>
               <FileViewerPage />
            </PrivateRoute>
           }

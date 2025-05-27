@@ -67,7 +67,6 @@ const ViewFilePage = () => {
           </SecureWrapper>
         </div>
         {/* <Agentview  id={fileData?.id}/> */}
-
       </div>
 
       {/* Unified Sidebar Overlay for both Mobile and Desktop */}

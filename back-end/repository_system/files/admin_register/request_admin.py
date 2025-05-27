@@ -14,9 +14,47 @@ SITE_URL = 'http://127.0.0.1:8000'  # This could be dynamic from settings
 
 @admin.register(Request)
 class RequestAdmin(admin.ModelAdmin):
-    list_display = ('description', 'status', 'created_at', 'action_buttons')
+    list_display = ('user_name', 'file_title', 'description', 'status', 'created_at', 'open_file_link', 'action_buttons')
     list_filter = ('status',)
     search_fields = ('user_request_id', 'requested_file_id', 'description')
+
+    def user_name(self, obj):
+        try:
+            guest = Guest.objects.filter(id=obj.user_request_id).first()
+            if guest:
+                return getattr(guest, 'username', None) or getattr(guest, 'email', None) or 'Unknown User'
+            from ..models import CustomUser
+            user = CustomUser.objects.filter(id=obj.user_request_id).first()
+            if user:
+                return user.get_full_name() or user.username or user.email or 'Unknown User'
+        except Exception:
+            pass
+        return 'Unknown User'
+    user_name.short_description = _('Request User')
+
+    def file_title(self, obj):
+        try:
+            file_obj = FileSystem.objects.filter(id=obj.requested_file_id).first()
+            if file_obj:
+                return file_obj.title
+        except Exception:
+            pass
+        return 'Unknown File'
+    file_title.short_description = _('Requested File')
+
+    def open_file_link(self, obj):
+        try:
+            file_obj = FileSystem.objects.filter(id=obj.requested_file_id).first()
+            if file_obj and file_obj.original_file_path:
+                path = file_obj.original_file_path
+                if path.startswith('files/media/'):
+                    path = 'files/' + path[len('files/media/'):]
+                url = f"{settings.MEDIA_URL}{path.lstrip('/')}"
+                return format_html('<a href="{}" target="_blank">Open</a>', url)
+        except Exception as e:
+            return f"Error: {e}"
+        return '-'
+    open_file_link.short_description = _('Open File')
 
     # Display action buttons and collapse feature
     def action_buttons(self, obj):

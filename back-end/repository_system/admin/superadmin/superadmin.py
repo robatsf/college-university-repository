@@ -58,7 +58,10 @@ JAZZMIN_SETTINGS = {
         "Files.PermissionSetting": "fas fa-user-shield",
         "Files.Request": "fas fa-user-cog",
         "Files.Departmentlist": "fas fa-clipboard-list",
-        "Files.Filesystem": "fas fa-folder-open"
+        "Files.Backup": "fas fa-database",
+        "Files.Recovery": "fas fa-history",
+        "Files.filesystem" : "fas fa-folder-open"
+            
 
     },
 
