@@ -255,3 +255,36 @@ class SearchManager:
     def get_similar_searches(query, limit=3):
         """Get similar searches"""
         return PopularSearch.get_similar(query, limit)
+
+class Backup(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    file_path = models.CharField(max_length=1024)
+    created_at = models.DateTimeField(default=now)
+    notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Backup and Recovery'
+        verbose_name_plural = 'Backup and Recovery'
+
+    def __str__(self):
+        return f"Backup {self.file_path}"
+    
+    def save(self, *args, **kwargs):
+        if not self.file_path:
+            # Create a backup file path automatically
+            backup_dir = os.path.join(settings.MEDIA_ROOT, 'db_backups')
+            os.makedirs(backup_dir, exist_ok=True)
+            filename = f"backup_{timezone.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex}.json"
+            file_path = os.path.join('db_backups', filename)
+            self.file_path = file_path
+        super().save(*args, **kwargs)
+
+class Recovery(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    backup = models.ForeignKey(Backup, on_delete=models.CASCADE, related_name='recoveries')
+    recovered_by = models.CharField(max_length=255)
+    recovered_at = models.DateTimeField(default=now)
+    notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Recovery of {self.backup.file_path} by {self.recovered_by} at {self.recovered_at}"
